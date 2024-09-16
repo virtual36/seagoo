@@ -1,0 +1,68 @@
+%top {
+    #include <map>
+    #include <vector>
+    #include <string>
+
+    using namespace std;
+
+    map<string, vector<string>> symbols;
+}
+%language cpp
+%%
+/*
+enter translation_unit {
+    puts(ts_node_string(tbnode));
+    puts("###");
+}
+*/
+
+enter function_definition declaration {
+    TSNode declarator = tbnode;
+    TSNode next_declarator = declarator;
+    while (next_declarator = tbnode_child_by_field_name(next_declarator, "declarator"),
+            !ts_node_is_null(next_declarator)) {
+        declarator = next_declarator;
+    }
+
+    char * s = tbget_node_text(declarator);
+    symbols[ts_node_type(tbnode)].push_back(s);
+    free(s);
+}
+
+%%
+
+/* @BAKE
+    tbsp -o $*.tb.cpp $@
+    g++ -o $*.out $*.tb.cpp -I../library/ $(pkg-config --cflags --libs tree-sitter tree-sitter-cpp)
+    ./$*.out c_symbol_extractor.tb.cpp
+   @STOP
+*/
+
+signed main(int argc, char * * argv) {
+    if (argc < 2) {
+        return 1;
+    }
+
+	FILE* f = fopen(argv[1], "r");
+	fseek(f, 0, SEEK_END);
+	int flen = ftell(f);
+	rewind(f);
+	char fstr[flen+1];
+	fstr[flen] = '\00';
+	fread(fstr, flen, sizeof(char), f);
+	fclose(f);
+
+    tbtraverse(fstr);
+
+    for (const auto &i : symbols) {
+        puts((i.first + " " + to_string(i.second.size())).c_str());
+        for (const auto &h : i.second) {
+            printf("- %s\n", h.c_str());
+        }
+        puts("");
+    }
+
+    return 0;
+}
+
+int i;
