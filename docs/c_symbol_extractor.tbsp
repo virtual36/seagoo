@@ -1,4 +1,4 @@
-%top {
+top {
     #include <map>
     #include <vector>
     #include <string>
