@@ -18,7 +18,7 @@ int load_config(const char * filename, config_t * cfg) {
 int store_config(const char * filename, const config_t * cfg) {
   FILE * file = fopen(filename, "w");
   if (!file) {
-    perror("error opening config file for writing");
+    fprintf(stderr, "err: problem opening config file for writing\n");
     return EXIT_FAILURE;
   }
 

@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <libconfig.h>
+#include <libgen.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,10 +17,11 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "lib/kdq.h"
 #include "lib/khash.h"
 #include "lib/kstring.h"
 #include "lib/kvec.h"
+
+#include "circular_queue.h"
 
 /* +begin+ CONFIGURATION FILE HANDLING */
 #define CONFIG_FILENAME "seagoo.cfg"
@@ -32,17 +34,24 @@ int create_default_config_directory();
 
 /* +begin+ SOURCEFILE INDEXING */
 #define MAX_INCLUDES_TO_PARSE 1024
+#define MAX_INCLUDE_LENGTH 512
+#define INCLUDE_LINE_LENGTH 1024
+
+// TODO: make this configurable, move out of header
+const char * system_include_dirs[] = {
+    "/usr/include",
+    "/usr/local/include",
+};
 
 typedef struct {
-  SourceFileNode * resolved_includes;
-  char includes[MAX_INCLUDES_TO_PARSE];
-  const char filepath[PATH_MAX];
-  const char filename[256];
-  const unsigned char type;  // DIRENT directory type
+  char * include_filepaths[MAX_INCLUDES_TO_PARSE];
+  char filepath[PATH_MAX];
+  char filename[FILENAME_MAX];
+  unsigned char type;  // DIRENT directory type
 } SourceFileNode;
 
 int index_sourcefiles(const char * directory);
-int parse_includes(const char * filepath, const char ** includes);
+int parse_includes(char * filepath, char ** include_filepaths);
 /* -end- SOURCEFILE INDEXING */
 
 #endif /* SEAGOO_H */
