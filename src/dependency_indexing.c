@@ -70,7 +70,8 @@ int index_sourcefiles(const char * directory) {
         break;
 
       case DT_REG:  // regular file
-        if (parse_include_filepaths(curr->filepath, curr->include_filepaths) == 0) {
+        if (parse_include_filepaths(curr->filepath, curr->include_filepaths) ==
+            0) {
           for (size_t i = 0; i < MAX_INCLUDES_TO_PARSE; ++i) {
             if (curr->include_filepaths[i]) {
               if (process_entry(curr->include_filepaths[i], DT_REG,
@@ -148,8 +149,8 @@ char * resolve_include_path(const char * current_file,
     base_include_path[strlen(base_include_path) - 1] = '\0';
 
     char temp_resolved_path[PATH_MAX];
-    snprintf(resolved_path, sizeof(resolved_path), "%s/%s",
-             default_include_path, base_include_path);
+    snprintf(resolved_path, sizeof(resolved_path), "%s/%s", default_include_path,
+             base_include_path);
     if (realpath(resolved_path, temp_resolved_path) != NULL) {
       return strdup(temp_resolved_path);
     }

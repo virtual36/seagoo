@@ -72,7 +72,8 @@ int create_default_config_directory() {
   char config_dir[PATH_MAX - sizeof(CONFIG_FILENAME) - 1];
   snprintf(config_dir, sizeof(config_dir), "%s/.config/seagoo", home_dir);
   char config_file[PATH_MAX];
-  snprintf(config_file, sizeof(config_file), "%s/%s", config_dir, CONFIG_FILENAME);
+  snprintf(config_file, sizeof(config_file), "%s/%s", config_dir,
+           CONFIG_FILENAME);
 
   struct stat st;
 
