@@ -37,12 +37,6 @@ int create_default_config_directory();
 #define MAX_INCLUDE_LENGTH 512
 #define INCLUDE_LINE_LENGTH 1024
 
-// TODO: make this configurable, move out of header
-const char * system_include_dirs[] = {
-    "/usr/include",
-    "/usr/local/include",
-};
-
 typedef struct {
   char * include_filepaths[MAX_INCLUDES_TO_PARSE];
   char filepath[PATH_MAX];
@@ -51,7 +45,7 @@ typedef struct {
 } SourceFileNode;
 
 int index_sourcefiles(const char * directory);
-int parse_includes(char * filepath, char ** include_filepaths);
+int parse_include_filepaths(char * filepath, char ** include_filepaths);
 /* -end- SOURCEFILE INDEXING */
 
 #endif /* SEAGOO_H */

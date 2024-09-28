@@ -34,7 +34,7 @@ int circular_queue_is_full(circular_queue * q) {
 // Enqueue an item into the circular queue
 int circular_queue_enqueue(circular_queue * q, void * item) {
   if (circular_queue_is_full(q)) {
-    fprintf(stderr, "err: Ciruclar Queue is full. Cannot enqueue %d.\n", item);
+    fprintf(stderr, "err: Ciruclar Queue is full. Cannot enqueue.\n");
     return -1;
   }
   q->data[q->rear] = item;

@@ -12,7 +12,7 @@ int process_entry(const char * full_path,
                   khash_t(file_map) * file_map);
 
 /* Index source files (just files, not symbols), entry-point for this indexer */
-int index_sourcefile(const char * directory) {
+int index_sourcefiles(const char * directory) {
   DIR * dir;
   struct dirent * entry;
 
@@ -55,7 +55,7 @@ int index_sourcefile(const char * directory) {
       case DT_DIR:  // directory
         if ((dir = opendir(curr->filepath))) {
           while ((entry = readdir(dir)) != NULL) {  // add children into queue
-            char full_path[PATH_MAX];
+            char full_path[PATH_MAX + FILENAME_MAX + 1];
             snprintf(full_path, sizeof(full_path), "%s/%s", curr->filepath,
                      entry->d_name);
 
@@ -70,7 +70,7 @@ int index_sourcefile(const char * directory) {
         break;
 
       case DT_REG:  // regular file
-        if (parse_includes(curr->filepath, curr->include_filepaths) == 0) {
+        if (parse_include_filepaths(curr->filepath, curr->include_filepaths) == 0) {
           for (size_t i = 0; i < MAX_INCLUDES_TO_PARSE; ++i) {
             if (curr->include_filepaths[i]) {
               if (process_entry(curr->include_filepaths[i], DT_REG,
@@ -86,8 +86,6 @@ int index_sourcefile(const char * directory) {
         break;
     }
 
-    free(curr->filepath);
-    free(curr->filename);
     free(curr);
   }
 
@@ -132,8 +130,9 @@ char * resolve_include_path(const char * current_file,
              include_path);
 
     // resolve that path to an absolute path
-    if (realpath(resolved_path, resolved_path) != NULL) {
-      return strdup(resolved_path);
+    char temp_resolved_path[PATH_MAX];
+    if (realpath(resolved_path, temp_resolved_path) != NULL) {
+      return strdup(temp_resolved_path);
     } else {
       fprintf(stderr, "err: failed to resolve relative path for %s\n",
               include_path);
@@ -143,21 +142,21 @@ char * resolve_include_path(const char * current_file,
   // search through the standard directories for system includes
   if (include_path[0] == '<' && include_path[strlen(include_path) - 1] == '>') {
     // remove angle brackets from string
-    char base_include_path[PATH_MAX];
+    const char * default_include_path = "/usr/include";
+    char base_include_path[PATH_MAX - strlen(default_include_path) - 1];
     strncpy(base_include_path, include_path + 1, sizeof(base_include_path));
     base_include_path[strlen(base_include_path) - 1] = '\0';
 
-    for (size_t i = 0;
-         i < sizeof(system_include_dirs) / sizeof(system_include_dirs[0]); i++) {
-      snprintf(resolved_path, sizeof(resolved_path), "%s/%s",
-               system_include_dirs[i], base_include_path);
-      if (realpath(resolved_path, resolved_path) != NULL) {
-        return strdup(resolved_path);
-      }
+    char temp_resolved_path[PATH_MAX];
+    snprintf(resolved_path, sizeof(resolved_path), "%s/%s",
+             default_include_path, base_include_path);
+    if (realpath(resolved_path, temp_resolved_path) != NULL) {
+      return strdup(temp_resolved_path);
     }
-    fprintf(stderr, "err: failed to resolve system include path for %s\n",
-            include_path);
   }
+
+  fprintf(stderr, "err: failed to resolve system include path for %s\n",
+          include_path);
 
   return NULL;
 }

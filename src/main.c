@@ -2,9 +2,19 @@
 
 int main(int argc, char ** argv) {
   /* +begin+ ARGUMENT PARSING */
-  char * source_dir = NULL;  // the directory to parse
+  char * source_dir = malloc(PATH_MAX);  // the directory to parse
+  if (source_dir == NULL) {
+    fprintf(stderr, "err: malloc for source_dir failed\n");
+    return EXIT_FAILURE;
+  }
+  // default to the current directory if none specifiedma
+  if (getcwd(source_dir, PATH_MAX) == NULL) {
+    fprintf(stderr, "err: getcwd failed\n");
+    free(source_dir);
+    return EXIT_FAILURE;
+  }
+
   int option;
-  getcwd(source_dir, PATH_MAX);  // default to current directory
   while ((option = getopt(argc, argv, "d:")) != -1) {
     switch (option) {
       case 'd':
