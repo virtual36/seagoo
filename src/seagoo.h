@@ -40,9 +40,7 @@ typedef enum {
 extern int yylex();
 
 typedef struct {
-  char filepath[PATH_MAX];
-  char filename[FILENAME_MAX];
-  unsigned char type;  // DIRENT directory type
+  char * filepath;
 } SourceFileNode;
 
 int index_sourcefiles(const char * directory);
@@ -51,16 +49,38 @@ int parse_include_filepaths(const char * filepath);
 #define CREATE_TABLES_SQL                    \
   "CREATE TABLE IF NOT EXISTS SourceFiles (" \
   "id INTEGER PRIMARY KEY AUTOINCREMENT,"    \
-  "filepath TEXT NOT NULL UNIQUE,"           \
-  "filename TEXT NOT NULL,"                  \
-  "type INTEGER NOT NULL);"
+  "filepath TEXT NOT NULL UNIQUE);"
 
-#define INSERT_SOURCEFILE_SQL \
-  "INSERT INTO SourceFiles (filepath, filename, type) VALUES (?, ?, ?);"
+#define INSERT_SOURCEFILE_SQL "INSERT INTO SourceFiles (filepath) VALUES (?);"
+
+// Define the Includes table
+#define CREATE_INCLUDES_TABLE_SQL                            \
+  "CREATE TABLE IF NOT EXISTS Includes ("                    \
+  "id INTEGER PRIMARY KEY AUTOINCREMENT,"                    \
+  "source_file_id INTEGER,"                                  \
+  "included_file_id INTEGER,"                                \
+  "FOREIGN KEY (source_file_id) REFERENCES SourceFiles(id)," \
+  "FOREIGN KEY (included_file_id) REFERENCES SourceFiles(id));"
+
+// Insert statement for the Includes table
+#define INSERT_INCLUDE_SQL \
+  "INSERT INTO Includes (source_file_id, included_file_id) VALUES (?, ?);"
+
+// Query to lookup includes for a given source file
+#define LOOKUP_INCLUDES_SQL                                              \
+  "SELECT sf_included.filepath "                                         \
+  "FROM Includes i "                                                     \
+  "JOIN SourceFiles sf ON i.source_file_id = sf.id "                     \
+  "JOIN SourceFiles sf_included ON i.included_file_id = sf_included.id " \
+  "WHERE sf.filepath = ?;"
 
 int init_db(const char * db_filepath);
 int create_tables(sqlite3 * db);
 int insert_source_file(sqlite3 * db, const SourceFileNode * record);
+int insert_include(sqlite3 * db,
+                   int source_file_id,
+                   char * included_filepath);
+int get_source_file_id(sqlite3 * db, char * filepath);
 int close_db(sqlite3 * db);
 /* -end- SOURCEFILE INDEXING */
 
