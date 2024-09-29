@@ -46,6 +46,7 @@ typedef struct {
 
 int index_sourcefiles(const char * directory);
 int parse_include_filepaths(char * filepath, char ** include_filepaths);
+int tbtraverse(const char * const tbcode);
 /* -end- SOURCEFILE INDEXING */
 
 #endif /* SEAGOO_H */
