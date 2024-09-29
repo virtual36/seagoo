@@ -16,8 +16,8 @@ static int process_file(const char * filepath,
     // add current file itself to the DB
     SourceFileNode record;
     record.filepath = strdup(filepath);
-    if (insert_source_file(db, &record) != SQLITE_OK) {
-      fprintf(stderr, "Failed to insert include: %s\n", record.filepath);
+    if (insert_source_file(db, &record) != SQLITE_DONE) {
+      fprintf(stderr, "Failed to insert source file: %s\n", record.filepath);
     }
     free(record.filepath);
 
@@ -50,6 +50,11 @@ int index_sourcefiles(const char * directory) {
 
 /* Uses depgra-inspired Lex/Yacc parser to grab includes from file */
 int parse_include_filepaths(const char * filepath) {
+  /* Note that this function does not return anything because the Bison
+   * generated header contains a definition which automatically inserts
+   * includes that were found in a file to the INCLUDES table of the DB
+   */
+  // TODO(emil, anon): does this parser look like it's correct?
   FILE * file = fopen(filepath, "r");
   if (!file) {
     perror("Failed to open file");
