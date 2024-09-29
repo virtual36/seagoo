@@ -38,7 +38,6 @@ int main(int argc, char ** argv) {
     return EXIT_FAILURE;
   }
   const char * home_dir = getenv("HOME");
-  printf("%s\n", home_dir);
   if (home_dir == NULL) {
     fprintf(stderr, "err: $HOME environment variable is not set.\n");
     return EXIT_FAILURE;

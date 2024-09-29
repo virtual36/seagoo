@@ -34,7 +34,6 @@ int index_sourcefiles(const char * directory) {
   if (join_paths(directory, "seagoo.db", directory_full_path, sz)) {
     fprintf(stderr, "err: error joining paths while indexing sourcefiles\n");
   }
-  printf("%s\n", directory_full_path);
 
   if (init_db(directory_full_path) != SQLITE_OK) {
     fprintf(stderr, "Failed to initialize the database\n");
@@ -214,7 +213,6 @@ void lookup_includes(sqlite3 * db, const char * filepath) {
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     const char * included_file = (const char *)sqlite3_column_text(stmt, 0);
-    printf("Included file: %s\n", included_file);
   }
 
   sqlite3_finalize(stmt);

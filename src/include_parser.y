@@ -27,7 +27,7 @@ input:
 
 include_stmt:
     INCLUDE string {
-        printf("Found include: %s\n", $2);
+        // printf("Found include: %s\n", $2);
 
         int key = get_source_file_id(db, current_file_path);
         if (key == -1) {
