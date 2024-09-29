@@ -36,7 +36,7 @@ int join_paths(const char * left,
   size_t required_size = left_len + right_len + 2;
 
   if (required_size > out_size) {
-    return 1;  /* buffer too small */
+    return 1; /* buffer too small */
   }
 
   strcpy(out, left);

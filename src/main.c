@@ -39,7 +39,6 @@ int main(int argc, char ** argv) {
   if (create_default_config_directory()) {
     return EXIT_FAILURE;
   }
-  printf("create default config directory");
   const char * home_dir = getenv("HOME");
   if (home_dir == NULL) {
     fprintf(stderr, "err: $HOME environment variable is not set.\n");
@@ -48,16 +47,18 @@ int main(int argc, char ** argv) {
   char config_file[PATH_MAX];
   snprintf(config_file, sizeof(config_file), "%s/.config/seagoo/%s", home_dir,
            CONFIG_FILENAME);
-  printf("%s\n", config_file);
 
-  config_t loaded_cfg;
-  load_config(config_file, &loaded_cfg);
+  config_t cfg;
+  load_config(config_file, &cfg);
   /* -end- CONFIGURATION FILE HANDLING */
 
   /* +begin+ CODEBASE INDEXING */
   index_sourcefiles(source_dir);
-  close_db(db);
   /* -end- CODEBASE INDEXING */
+
+  /* +begin+ CLEANUP */
+  close_db(db);
+  /* -end- CLEANUP */
 
   return EXIT_SUCCESS;
 }

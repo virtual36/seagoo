@@ -5,6 +5,14 @@ static int process_file(const char * filepath,
                         const struct stat * statbuf,
                         int typeflag) {
   if (typeflag == FTW_F || typeflag == FTW_SL) {
+    /* TODO: support in the config adding a list of regex patterns for
+     * a whitelist and blacklist. This is so that users can indicate to
+     * us what files they want us to index.
+     */
+    if (is_binary_file(filepath)) {
+      return 0;
+    }
+
     // add current file itself to the DB
     SourceFileNode record;
     record.filepath = strdup(filepath);
@@ -232,6 +240,7 @@ int get_source_file_id(sqlite3 * db, char * filepath) {
 
 /* Closes the database */
 int close_db(sqlite3 * db) {
-  if (db) return sqlite3_close(db);
+  if (db)
+    return sqlite3_close(db);
   return -1;
 }

@@ -1,6 +1,7 @@
 #ifndef SEAGOO_H
 #define SEAGOO_H
 
+#include <ctype.h>
 #include <dirent.h>
 #include <errno.h>
 #include <ftw.h>
@@ -15,7 +16,6 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <ctype.h>
 
 #include "lib/khash.h"
 #include "lib/kstring.h"
@@ -81,9 +81,7 @@ extern char * current_file_path;
 int init_db(const char * db_filepath);
 int create_tables(sqlite3 * db);
 int insert_source_file(sqlite3 * db, const SourceFileNode * record);
-int insert_include(sqlite3 * db,
-                   int source_file_id,
-                   char * included_filepath);
+int insert_include(sqlite3 * db, int source_file_id, char * included_filepath);
 int get_source_file_id(sqlite3 * db, char * filepath);
 int close_db(sqlite3 * db);
 /* -end- SOURCEFILE INDEXING */
@@ -96,7 +94,7 @@ int tbtraverse(const char * tbcode);
 #define PATH_SEPARATOR "/"
 int is_binary_file(const char * filepath);
 int join_paths(const char * left,
-               const char * right, 
+               const char * right,
                char * out,
                size_t out_size);
 /* -end- UTILITIES */
