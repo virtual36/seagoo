@@ -30,6 +30,7 @@ int load_config(const char * filename, config_t * cfg);
 int store_config(const char * filename, const config_t * cfg);
 int write_default_config(const char * filename);
 int create_default_config_directory();
+int get_config_value(const char * key, const config_t * cfg, void * out_value);
 /* -end- CONFIGURATION FILE HANDLING */
 
 /* +begin+ SOURCEFILE INDEXING */
@@ -55,7 +56,8 @@ extern char * current_file_path;
   "id INTEGER PRIMARY KEY AUTOINCREMENT,"    \
   "filepath TEXT NOT NULL UNIQUE);"
 
-#define INSERT_SOURCEFILE_SQL "INSERT INTO SourceFiles (filepath) VALUES (?);"
+#define INSERT_SOURCEFILE_SQL \
+  "INSERT OR IGNORE INTO SourceFiles (filepath) VALUES (?);"
 
 // Define the Includes table
 #define CREATE_INCLUDES_TABLE_SQL                            \
@@ -67,8 +69,9 @@ extern char * current_file_path;
   "FOREIGN KEY (included_file_id) REFERENCES SourceFiles(id));"
 
 // Insert statement for the Includes table
-#define INSERT_INCLUDE_SQL \
-  "INSERT INTO Includes (source_file_id, included_file_id) VALUES (?, ?);"
+#define INSERT_INCLUDE_SQL                                                    \
+  "INSERT OR IGNORE INTO Includes (source_file_id, included_file_id) VALUES " \
+  "(?, ?);"
 
 // Query to lookup includes for a given source file
 #define LOOKUP_INCLUDES_SQL                                              \

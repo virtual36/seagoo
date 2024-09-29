@@ -29,9 +29,12 @@ static int process_file(const char * filepath,
 
 /* Entry-point for indexer, accepts a codebase directory for indexing */
 int index_sourcefiles(const char * directory) {
-  const size_t sz = sizeof(directory) + 11;
+  const size_t sz = strlen(directory) + strlen("seagoo.db") + 2;
   char directory_full_path[sz];
-  join_paths(directory, "seagoo.db", directory_full_path, sz);
+  if (join_paths(directory, "seagoo.db", directory_full_path, sz)) {
+    fprintf(stderr, "err: error joining paths while indexing sourcefiles\n");
+  }
+  printf("%s\n", directory_full_path);
 
   if (init_db(directory_full_path) != SQLITE_OK) {
     fprintf(stderr, "Failed to initialize the database\n");
@@ -73,6 +76,7 @@ int init_db(const char * db_filepath) {
   }
 
   // sets the global database pointer
+  printf("creating new file at %s\n", db_filepath);
   int rc = sqlite3_open(db_filepath, &db);
 
   if (rc != SQLITE_OK) {

@@ -39,8 +39,8 @@ int write_default_config(const char * filename) {
       config_setting_add(root, "grep_binary", CONFIG_TYPE_STRING);
   config_setting_set_string(setting, "/usr/bin/rg"); /* just example */
 
-  setting = config_setting_add(root, "sqlite_db", CONFIG_TYPE_STRING);
-  config_setting_set_string(setting, "~/seagoo.db"); /* just example */
+  setting = config_setting_add(root, "sqlite_db_filename", CONFIG_TYPE_STRING);
+  config_setting_set_string(setting, "seagoo.db"); /* just example */
 
   setting = config_setting_add(root, "num_results_to_list", CONFIG_TYPE_INT);
   config_setting_set_int(setting, 5);
@@ -50,28 +50,7 @@ int write_default_config(const char * filename) {
 
   setting = config_setting_add(root, "parse_comments", CONFIG_TYPE_BOOL);
   config_setting_set_bool(setting, 0);
-
-  // list of regex patterns for files to whitelist and blacklist
-  setting = config_setting_add(root, "regex_blacklist_files", CONFIG_TYPE_LIST);
-
-  // initialise regex_whitelist_files with allowed file extensions
-  setting = config_setting_add(root, "regex_whitelist_files", CONFIG_TYPE_LIST);
-
-  // Adding allowed file extensions to the whitelist
-  config_setting_t * whitelist =
-      config_setting_add(root, "regex_whitelist_files", CONFIG_TYPE_LIST);
-  // Adding allowed file extensions to the whitelist
-  setting = config_setting_add(whitelist, NULL, CONFIG_TYPE_STRING);
-  config_setting_set_string(setting, "*.c");
-  setting = config_setting_add(whitelist, NULL, CONFIG_TYPE_STRING);
-  config_setting_set_string(setting, "*.h");
-  setting = config_setting_add(whitelist, NULL, CONFIG_TYPE_STRING);
-  config_setting_set_string(setting, "*.hpp");
-  setting = config_setting_add(whitelist, NULL, CONFIG_TYPE_STRING);
-  config_setting_set_string(setting, "*.cc");
-  setting = config_setting_add(whitelist, NULL, CONFIG_TYPE_STRING);
-  config_setting_set_string(setting, "*.cpp");
-
+  
   if (store_config(filename, &cfg) != EXIT_SUCCESS) {
     config_destroy(&cfg);
     return EXIT_FAILURE;
@@ -79,6 +58,12 @@ int write_default_config(const char * filename) {
 
   config_destroy(&cfg);
   return EXIT_SUCCESS;
+}
+
+/* Gets the value from the config for a given key */
+int get_config_value(const char * key, const config_t * cfg, void * out_value) {
+  // TODO: implement and use this instead of hardcoded values
+  return -1;
 }
 
 /* Create an empty configuration directory with defaults if it doesn't exist */
