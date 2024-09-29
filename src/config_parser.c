@@ -83,12 +83,12 @@ int create_default_config_directory() {
               config_dir, strerror(errno));
       return EXIT_FAILURE;
     }
-    if (!write_default_config(config_file)) {
+    if (write_default_config(config_file)) {
       return EXIT_FAILURE;
     }
   } else if (!S_ISDIR(st.st_mode)) {
     fprintf(stderr, "err: '%s' exists but is not a directory\n", config_dir);
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
   }
 
   return EXIT_SUCCESS;

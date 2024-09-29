@@ -10,9 +10,11 @@ int process_entry(const char * full_path,
                   unsigned char file_type,
                   circular_queue * queue,
                   khash_t(file_map) * file_map);
+int is_valid_source_file(const char * filepath);
 
 /* Index source files (just files, not symbols), entry-point for this indexer */
 int index_sourcefiles(const char * directory) {
+  printf("indexing");
   DIR * dir;
   struct dirent * entry;
 
@@ -70,6 +72,7 @@ int index_sourcefiles(const char * directory) {
         break;
 
       case DT_REG:  // regular file
+        printf("%s\n", curr->filepath);
         if (parse_include_filepaths(curr->filepath, curr->include_filepaths) ==
             0) {
           for (size_t i = 0; i < MAX_INCLUDES_TO_PARSE; ++i) {
@@ -86,6 +89,17 @@ int index_sourcefiles(const char * directory) {
       default:
         break;
     }
+
+    // Print filename, filepath, and include dependencies
+    // printf("Filename: %s\n", curr->filepath);
+    // printf("Filepath: %s\n", curr->filepath);
+    // printf("Includes:\n");
+    // for (size_t i = 0; i < MAX_INCLUDES_TO_PARSE; ++i) {
+    //   if (curr->include_filepaths[i]) {
+    //     printf("  - %s\n", curr->include_filepaths[i]);
+    //   }
+    // }
+    // printf("\n");
 
     free(curr);
   }
@@ -192,6 +206,10 @@ int process_entry(const char * full_path,
 
 /* Given a sourcefile, collect all include filepaths mentioned in the file */
 int parse_include_filepaths(char * filepath, char ** include_filepaths) {
+    if (!is_valid_source_file(filepath)) {
+    return EXIT_FAILURE;
+  }
+
   FILE * file = fopen(filepath, "r");
   if (!file) {
     fprintf(stderr, "err: could not open file %s\n", filepath);
@@ -261,4 +279,21 @@ int parse_include_filepaths(char * filepath, char ** include_filepaths) {
 
   fclose(file);
   return EXIT_SUCCESS;
+}
+
+int is_valid_source_file(const char * filepath) {
+  const char * extensions[] = {".c", ".h", ".cc", ".cpp", ".hpp"};
+  size_t num_extensions = sizeof(extensions) / sizeof(extensions[0]);
+
+  for (size_t i = 0; i < num_extensions; i++) {
+    size_t ext_len = strlen(extensions[i]);
+    size_t filepath_len = strlen(filepath);
+
+    // Check if filepath ends with the current extension
+    if (filepath_len >= ext_len &&
+        strcmp(filepath + filepath_len - ext_len, extensions[i]) == 0) {
+      return 1;  // Valid source file
+    }
+  }
+  return 0;  // Invalid source file
 }
