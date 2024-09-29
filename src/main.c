@@ -2,15 +2,10 @@
 
 int main(int argc, char ** argv) {
   /* +begin+ ARGUMENT PARSING */
-  char * source_dir = malloc(PATH_MAX);  // the directory to parse
-  if (source_dir == NULL) {
-    fprintf(stderr, "err: malloc for source_dir failed\n");
-    return EXIT_FAILURE;
-  }
+  char source_dir[PATH_MAX];  // the directory to parse
   // default to the current directory if none specifiedma
   if (getcwd(source_dir, PATH_MAX) == NULL) {
     fprintf(stderr, "err: getcwd failed\n");
-    free(source_dir);
     return EXIT_FAILURE;
   }
 
@@ -20,17 +15,14 @@ int main(int argc, char ** argv) {
       case 'd':
         if (realpath(optarg, source_dir) == NULL) {
           fprintf(stderr, "err: Failed to resolve provided path: %s\n", optarg);
-          free(source_dir);
           return EXIT_FAILURE;
         }
         break;  // Continue parsing for other options
       case 'h':
         fprintf(stderr, "Usage: %s [-d directory]\n", argv[0]);
-        free(source_dir);
         return EXIT_SUCCESS;
       default:  // Handle unknown options
         fprintf(stderr, "err: Unknown option\n");
-        free(source_dir);
         return EXIT_FAILURE;
     }
   }
