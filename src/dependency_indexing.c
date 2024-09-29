@@ -23,10 +23,10 @@ int index_sourcefiles(const char * directory) {
     return 1;
   }
 
-  if (db) { 
+  if (db) {
     close_db(db);
   }
-  
+
   return 0;
 }
 

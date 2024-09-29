@@ -3,6 +3,7 @@
 
 #include <dirent.h>
 #include <errno.h>
+#include <ftw.h>
 #include <libconfig.h>
 #include <libgen.h>
 #include <limits.h>
@@ -14,7 +15,6 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <ftw.h>
 
 #include "lib/khash.h"
 #include "lib/kstring.h"
@@ -33,9 +33,9 @@ int create_default_config_directory();
 
 /* +begin+ SOURCEFILE INDEXING */
 typedef enum {
-    DEFAULT,
-    INTERFACE,
-    SYSTEM,
+  DEFAULT,
+  INTERFACE,
+  SYSTEM,
 } node_t;
 extern int yylex();
 

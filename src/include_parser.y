@@ -33,7 +33,7 @@ include_stmt:
 
 string:
     STRING_LITERAL {
-        $$ = $1;  // Assign the string value to the result
+        $$ = $1;
     }
     ;
 
