@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include <ftw.h>
 
 #include "lib/khash.h"
 #include "lib/kstring.h"
@@ -31,11 +32,12 @@ int create_default_config_directory();
 /* -end- CONFIGURATION FILE HANDLING */
 
 /* +begin+ SOURCEFILE INDEXING */
+typedef enum {
+    DEFAULT,
+    INTERFACE,
+    SYSTEM,
+} node_t;
 extern int yylex();
-
-#define MAX_INCLUDES_TO_PARSE 1024
-#define MAX_INCLUDE_LENGTH 512
-#define INCLUDE_LINE_LENGTH 1024
 
 typedef struct {
   char filepath[PATH_MAX];

@@ -1,34 +1,32 @@
 #include "seagoo.h"
 
+/* FTW function for recursively processing nodes in file tree */
+static int process_file(const char * filepath,
+                        const struct stat * statbuf,
+                        int typeflag) {
+  if (typeflag == FTW_F || typeflag == FTW_SL) {
+    parse_include_filepaths(filepath);
+  }
+  return 0;
+}
+
 /* Entry-point for indexer, accepts a codebase directory for indexing */
 int index_sourcefiles(const char * directory) {
-  DIR * dir;
-  struct dirent * entry;
-
-  sqlite3 * db;
+  sqlite3 * db = NULL;
   if (init_db("source_files.db") != SQLITE_OK) {
     fprintf(stderr, "Failed to initialize the database\n");
     return 1;
   }
 
-  if ((dir = opendir(directory)) == NULL) {
-    perror("opendir");
+  if (ftw(directory, process_file, 20) == -1) {
+    perror("nftw");
     return 1;
   }
 
-  while ((entry = readdir(dir)) != NULL) {
-    if (entry->d_type == DT_REG || entry->d_type == DT_LNK) {
-      // Process regular files or symlinks
-      char fullpath[PATH_MAX];
-      snprintf(fullpath, PATH_MAX, "%s/%s", directory, entry->d_name);
-
-      // Parse the file to gather includes
-      parse_include_filepaths(fullpath);
-    }
+  if (db) { 
+    close_db(db);
   }
-
-  closedir(dir);
-  close_db(db);
+  
   return 0;
 }
 

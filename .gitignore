@@ -4,3 +4,7 @@
 *.o
 obj/*
 seagoo
+src/lexer.c
+src/include_lexer.l
+src/include_parser.tab.h
+src/include_parser.tab.c
