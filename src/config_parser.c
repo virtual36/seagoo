@@ -1,3 +1,4 @@
+#include <libconfig.h>
 #include "seagoo.h"
 
 /* Load configuration from a file */

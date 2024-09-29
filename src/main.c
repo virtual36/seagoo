@@ -1,3 +1,4 @@
+#include <libconfig.h>
 #include "seagoo.h"
 
 /* global db ptr for lex parser, does this put us on a list? */
@@ -56,6 +57,7 @@ int main(int argc, char ** argv) {
 
   /* +begin+ CLEANUP */
   close_db(db);
+  config_destroy(&cfg);
   /* -end- CLEANUP */
 
   return EXIT_SUCCESS;

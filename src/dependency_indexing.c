@@ -80,7 +80,7 @@ int init_db(const char * db_filepath) {
   }
 
   // sets the global database pointer
-  printf("creating new file at %s\n", db_filepath);
+  printf("creating index at %s\n", db_filepath);
   int rc = sqlite3_open(db_filepath, &db);
 
   if (rc != SQLITE_OK) {
