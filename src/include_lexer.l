@@ -1,6 +1,6 @@
 %{
 #include "include_parser.tab.h"
-#include <string.h>
+#include "seagoo.h"
 %}
 
 %%
