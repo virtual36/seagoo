@@ -1,11 +1,5 @@
 #include "seagoo.h"
 
-/* global db ptr for lex parser, does this put us on a list? */
-// TODO there must be another better way to parse info into Yacc
-// warning: ‘db’ initialized and declared ‘extern'
-extern sqlite3 * db = NULL;
-extern char * current_file_path = NULL;
-
 /* FTW function for recursively processing nodes in file tree */
 static int process_file(const char * filepath,
                         const struct stat * statbuf,
@@ -27,19 +21,18 @@ static int process_file(const char * filepath,
 
 /* Entry-point for indexer, accepts a codebase directory for indexing */
 int index_sourcefiles(const char * directory) {
-  if (init_db("source_files.db") != SQLITE_OK) {
+  const size_t sz = sizeof(directory) + 11;
+  char directory_full_path[sz];
+  join_paths(directory, "seagoo.db", directory_full_path, sz);
+
+  if (init_db(directory_full_path) != SQLITE_OK) {
     fprintf(stderr, "Failed to initialize the database\n");
     return 1;
   }
 
   if (ftw(directory, process_file, 20) == -1) {
     perror("ftw");
-    close_db(db);
     return 1;
-  }
-
-  if (db) {
-    close_db(db);
   }
 
   return 0;
@@ -66,20 +59,28 @@ int parse_include_filepaths(const char * filepath) {
 
 /* Initializes index database at a specific filepath with required tables */
 int init_db(const char * db_filepath) {
-  sqlite3 * db;
+  if (db_filepath == NULL) {
+    fprintf(stderr, "Database filepath is NULL\n");
+    return SQLITE_ERROR;
+  }
+
+  // sets the global database pointer
   int rc = sqlite3_open(db_filepath, &db);
 
-  if (rc) {
+  if (rc != SQLITE_OK) {
     fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
     return rc;
   }
 
-  if (create_tables(db) != SQLITE_OK) {
+  rc = create_tables(db);
+  if (rc != SQLITE_OK) {
+    fprintf(stderr, "Failed to create tables: %s\n", sqlite3_errmsg(db));
     sqlite3_close(db);
-    return -1;
+    return rc;
   }
 
-  sqlite3_close(db);
+  /* rc = sqlite3_exec(db, "VACUUM;", 0, 0, 0); */
+
   return SQLITE_OK;
 }
 
@@ -128,9 +129,7 @@ int insert_source_file(sqlite3 * db, const SourceFileNode * record) {
 }
 
 /* Insert an included file into the database (called from Yacc) */
-int insert_include(sqlite3 * db,
-                   int source_file_id,
-                   char * included_filepath) {
+int insert_include(sqlite3 * db, int source_file_id, char * included_filepath) {
   sqlite3_stmt * stmt;
   int included_file_id;
 
@@ -221,17 +220,18 @@ int get_source_file_id(sqlite3 * db, char * filepath) {
 
   sqlite3_bind_text(stmt, 1, filepath, -1, SQLITE_STATIC);
 
-  int source_file_id = -1;  // Default to -1 if not found
+  int source_file_id = -1;  // default to -1 if not found
   if (sqlite3_step(stmt) == SQLITE_ROW) {
     source_file_id = sqlite3_column_int(stmt, 0);
   }
 
   sqlite3_finalize(stmt);
 
-  return source_file_id;  // Return the found ID or -1 if not found
+  return source_file_id;  // return found ID or -1 if not found
 }
 
 /* Closes the database */
 int close_db(sqlite3 * db) {
-  return sqlite3_close(db);
+  if (db) return sqlite3_close(db);
+  return -1;
 }

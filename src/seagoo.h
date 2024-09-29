@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #include "lib/khash.h"
 #include "lib/kstring.h"
@@ -45,6 +46,9 @@ typedef struct {
 
 int index_sourcefiles(const char * directory);
 int parse_include_filepaths(const char * filepath);
+
+extern sqlite3 * db;
+extern char * current_file_path;
 
 #define CREATE_TABLES_SQL                    \
   "CREATE TABLE IF NOT EXISTS SourceFiles (" \
@@ -85,7 +89,16 @@ int close_db(sqlite3 * db);
 /* -end- SOURCEFILE INDEXING */
 
 /* +begin+ SYNTAX TREE CONSTRUCTION */
-int tbtraverse(const char * const tbcode);
+int tbtraverse(const char * tbcode);
 /* -end- SYNTAX TREE CONSTRUCTION */
+
+/* +begin+ UTILITIES */
+#define PATH_SEPARATOR "/"
+int is_binary_file(const char * filepath);
+int join_paths(const char * left,
+               const char * right, 
+               char * out,
+               size_t out_size);
+/* -end- UTILITIES */
 
 #endif /* SEAGOO_H */

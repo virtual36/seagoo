@@ -11,7 +11,7 @@ OBJ_PATH  := obj
 SRC_PATH  := src
 
 INC       := -Isrc -Isrc/lib
-SRC       := circular_queue.c config_parser.c dependency_indexing.c main.c
+SRC       := utils.c circular_queue.c config_parser.c dependency_indexing.c main.c
 OBJ       := $(patsubst %,$(OBJ_PATH)/%,$(SRC:.c=.o))
 
 LDFLAGS   := -L/usr/lib -lconfig -lfl -lsqlite3

@@ -1,5 +1,10 @@
 #include "seagoo.h"
 
+/* global db ptr for lex parser, does this put us on a list? */
+// TODO there must be another better way to parse info into Yacc
+sqlite3 * db = NULL;
+char * current_file_path = NULL;
+
 int main(int argc, char ** argv) {
   /* +begin+ ARGUMENT PARSING */
   char source_dir[PATH_MAX];  // the directory to parse
@@ -51,6 +56,7 @@ int main(int argc, char ** argv) {
 
   /* +begin+ CODEBASE INDEXING */
   index_sourcefiles(source_dir);
+  close_db(db);
   /* -end- CODEBASE INDEXING */
 
   return EXIT_SUCCESS;

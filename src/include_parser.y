@@ -30,7 +30,10 @@ include_stmt:
         printf("Found include: %s\n", $2);
 
         int key = get_source_file_id(db, current_file_path);
-        
+        if (key == -1) {
+            goto frees;
+        }
+
         SourceFileNode record;
         record.filepath = strdup(current_file_path);
 
@@ -44,6 +47,7 @@ include_stmt:
             fprintf(stderr, "Failed to insert include: %s\n", record.filepath);
         }
 
+    frees:
         free(record.filepath);
         free(include_file);
         // free(yylval.str); 
