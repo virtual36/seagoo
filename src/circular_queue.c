@@ -1,6 +1,6 @@
 #include "circular_queue.h"
 
-// Initialize the circular queue with a fixedlength
+/* Initialize the circular queue with a fixedlength */
 int circular_queue_init(circular_queue * q, int size) {
   q->data = (void **)malloc(size * sizeof(int));
   if (!q->data) {
@@ -14,24 +14,24 @@ int circular_queue_init(circular_queue * q, int size) {
   return 0;
 }
 
-// Destroy the circular queue and free the allocated memory
+/* Destroy the circular queue and free the allocated memory*/
 int circular_queue_destroy(circular_queue * q) {
   free(q->data);
   q->data = NULL;
   return 0;
 }
 
-// Check if the queue is empty
+/* Check if the queue is empty*/
 int circular_queue_is_empty(circular_queue * q) {
   return (q->count == 0) ? 1 : 0;
 }
 
-// Check if the queue is full
+/* Check if the queue is full*/
 int circular_queue_is_full(circular_queue * q) {
   return (q->count == q->size) ? 1 : 0;
 }
 
-// Enqueue an item into the circular queue
+/* Enqueue an item into the circular queue*/
 int circular_queue_enqueue(circular_queue * q, void * item) {
   if (circular_queue_is_full(q)) {
     fprintf(stderr, "err: Ciruclar Queue is full. Cannot enqueue.\n");
@@ -43,7 +43,7 @@ int circular_queue_enqueue(circular_queue * q, void * item) {
   return 0;
 }
 
-// Dequeue an item from the circular queue
+/* Dequeue an item from the circular queue*/
 int circular_queue_dequeue(circular_queue * q, void ** item) {
   if (circular_queue_is_empty(q)) {
     fprintf(stderr, "err: Circular queue is empty. Cannot dequeue.\n");

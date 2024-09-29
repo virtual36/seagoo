@@ -1,6 +1,3 @@
-/* TODO: once this gets big enough, we can move to multiple headers
- *       rather than just one ginormous header file */
-
 #ifndef SEAGOO_H
 #define SEAGOO_H
 
@@ -9,6 +6,7 @@
 #include <libconfig.h>
 #include <libgen.h>
 #include <limits.h>
+#include <sqlite3.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,20 +31,39 @@ int create_default_config_directory();
 /* -end- CONFIGURATION FILE HANDLING */
 
 /* +begin+ SOURCEFILE INDEXING */
+extern int yylex();
+
 #define MAX_INCLUDES_TO_PARSE 1024
 #define MAX_INCLUDE_LENGTH 512
 #define INCLUDE_LINE_LENGTH 1024
 
 typedef struct {
-  char * include_filepaths[MAX_INCLUDES_TO_PARSE];
   char filepath[PATH_MAX];
   char filename[FILENAME_MAX];
   unsigned char type;  // DIRENT directory type
 } SourceFileNode;
 
 int index_sourcefiles(const char * directory);
-int parse_include_filepaths(char * filepath, char ** include_filepaths);
-int tbtraverse(const char * const tbcode);
+int parse_include_filepaths(const char * filepath);
+
+#define CREATE_TABLES_SQL                    \
+  "CREATE TABLE IF NOT EXISTS SourceFiles (" \
+  "id INTEGER PRIMARY KEY AUTOINCREMENT,"    \
+  "filepath TEXT NOT NULL UNIQUE,"           \
+  "filename TEXT NOT NULL,"                  \
+  "type INTEGER NOT NULL);"
+
+#define INSERT_SOURCEFILE_SQL \
+  "INSERT INTO SourceFiles (filepath, filename, type) VALUES (?, ?, ?);"
+
+int init_db(const char * db_filepath);
+int create_tables(sqlite3 * db);
+int insert_source_file(sqlite3 * db, const SourceFileNode * record);
+int close_db(sqlite3 * db);
 /* -end- SOURCEFILE INDEXING */
+
+/* +begin+ SYNTAX TREE CONSTRUCTION */
+int tbtraverse(const char * const tbcode);
+/* -end- SYNTAX TREE CONSTRUCTION */
 
 #endif /* SEAGOO_H */

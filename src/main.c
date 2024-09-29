@@ -34,7 +34,7 @@ int main(int argc, char ** argv) {
         return EXIT_FAILURE;
     }
   }
-  
+
   fprintf(stdout, "%s\n", source_dir);
   /* +end+ ARGUMENT PARSING */
 
