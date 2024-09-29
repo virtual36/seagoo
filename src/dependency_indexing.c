@@ -200,22 +200,42 @@ int insert_include(sqlite3 * db, int source_file_id, char * included_filepath) {
 }
 
 /* Lookup included files for a given source file */
-void lookup_includes(sqlite3 * db, const char * filepath) {
+includes_vector_t * lookup_includes(sqlite3 * db, const char * filepath) {
   sqlite3_stmt * stmt;
   const char * sql = LOOKUP_INCLUDES_SQL;
 
+  includes_vector_t * result = malloc(sizeof(includes_vector_t));
+  if (!result) {
+    fprintf(stderr, "Memory allocation failed\n");
+    return NULL;
+  }
+  kv_init(*result);
+
   if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
     fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
-    return;
+    free(result);
+    return NULL;
   }
 
   sqlite3_bind_text(stmt, 1, filepath, -1, SQLITE_STATIC);
-
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     const char * included_file = (const char *)sqlite3_column_text(stmt, 0);
+    kv_push(char *, *result, strdup(included_file));
   }
-
   sqlite3_finalize(stmt);
+
+  return result;
+}
+
+/* Frees the includes vector, if more metadata is stored then add here */
+void destroy_includes_vector(includes_vector_t * vec) {
+  if (vec) {
+    for (size_t i = 0; i < kv_size(*vec); ++i) {
+      free(kv_A(*vec, i));
+    }
+    kv_destroy(*vec);
+    free(vec);
+  }
 }
 
 /* Function to get the source file ID from the SourceFiles table */

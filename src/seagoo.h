@@ -87,6 +87,10 @@ int insert_source_file(sqlite3 * db, const SourceFileNode * record);
 int insert_include(sqlite3 * db, int source_file_id, char * included_filepath);
 int get_source_file_id(sqlite3 * db, char * filepath);
 int close_db(sqlite3 * db);
+
+typedef kvec_t(char *) includes_vector_t;
+includes_vector_t * lookup_includes(sqlite3 * db, const char * filepath);
+void destroy_includes_vector(includes_vector_t * vec);
 /* -end- SOURCEFILE INDEXING */
 
 /* +begin+ SYNTAX TREE CONSTRUCTION */

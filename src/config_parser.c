@@ -50,7 +50,7 @@ int write_default_config(const char * filename) {
 
   setting = config_setting_add(root, "parse_comments", CONFIG_TYPE_BOOL);
   config_setting_set_bool(setting, 0);
-  
+
   if (store_config(filename, &cfg) != EXIT_SUCCESS) {
     config_destroy(&cfg);
     return EXIT_FAILURE;
