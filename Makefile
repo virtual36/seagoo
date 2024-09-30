@@ -1,17 +1,17 @@
-SRC_PATH  := src
-OBJ_PATH  := obj
-LIB_PATH  := lib
-DIRS      := $(SRC_PATH) $(OBJ_PATH)
+SRC_DIR   := src
+OBJ_DIR   := obj
+LIB_DIR   := lib
+DIRS      := $(SRC_DIR) $(OBJ_DIR)
 
 LIB       := libconfig libmagic libfl sqlite3
 SRC       := utils.c circular_queue.c config_parser.c dependency_indexing.c main.c lexer.c log.c
 
-DEP       := $(addprefix $(OBJ_PATH)/,$(SRC:.c=.d))
+DEP       := $(addprefix $(OBJ_DIR)/,$(SRC:.c=.d))
 OBJ       := $(DEP:.d=.d.o)
 
 CC        := gcc
 
-CPPFLAGS  := -D_FORTIFY_SOURCE=2 -I$(SRC_PATH) -I$(LIB_PATH)
+CPPFLAGS  := -D_FORTIFY_SOURCE=2 -I$(SRC_DIR) -I$(LIB_DIR)
 
 CFLAGS    := -pipe -pie -Wl,-z,relro,-z,now -Wl,-z,noexecstack -Wl,-z,separate-code -Wall -Wno-unused-function \
              $(shell pkg-config --cflags $(LIB))
@@ -42,20 +42,20 @@ run:
 	seagoo
 
 clean:
-	rm $(OBJ_PATH)/* src/lexer.c seagoo
-	rmdir $(OBJ_PATH)
+	rm $(OBJ_DIR)/* src/lexer.c seagoo
+	rmdir $(OBJ_DIR)
 
 .PHONY: all debug release clean run
 
 include_lexer.l: # header
 
-$(SRC_PATH)/lexer.c: $(SRC_PATH)/include_lexer.l
+$(SRC_DIR)/lexer.c: $(SRC_DIR)/include_lexer.l
 	$(LEX) -o $@ $<
 
-$(OBJ_PATH)/%.d.o: $(SRC_PATH)/%.c $(OBJ_PATH)/%.d
+$(OBJ_DIR)/%.d.o: $(SRC_DIR)/%.c $(OBJ_DIR)/%.d
 	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
 
-$(OBJ_PATH)/%.d: $(SRC_PATH)/%.c | $(OBJ_PATH)
+$(OBJ_DIR)/%.d: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -MM -MF $@ -MT $(addsuffix .o,$@) $<
 
 $(DIRS):
