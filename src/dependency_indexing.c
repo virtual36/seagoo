@@ -21,8 +21,7 @@ static int process_file(const char * filepath,
     }
     free(record.filepath);
 
-    // process any includes in the file to the DB
-    parse_include_filepaths(filepath);
+    kv_push(char *, input_file_queue, strdup(filepath));
   }
   return 0;
 }
@@ -45,32 +44,9 @@ int index_sourcefiles(const char * directory) {
     perror("ftw");
     return 1;
   }
-  // XXX: extra includes
 
-  return 0;
-}
+  yylex();
 
-/* Uses depgra-inspired Lex/Yacc parser to grab includes from file */
-int parse_include_filepaths(const char * filepath) {
-  /* Note that this function does not return anything because the Bison
-   * generated header contains a definition which automatically inserts
-   * includes that were found in a file to the INCLUDES table of the DB
-   */
-  // XXX: it should return an error code
-  FILE * file = fopen(filepath, "r");
-  if (!file) {
-    perror("Failed to open file");
-    return 1;
-  }
-
-  extern FILE * yyin;
-  yyin = file;
-
-  current_file_path = strdup(filepath);
-  yyparse();
-
-  fclose(file);
-  free(current_file_path);
   return 0;
 }
 

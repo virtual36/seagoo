@@ -107,4 +107,7 @@ int join_paths(const char * left,
                size_t out_size);
 /* -end- UTILITIES */
 
+typedef kvec_t(char *) string_vector;
+extern string_vector input_file_queue; // XXX: the name is kinda misleading
+
 #endif /* SEAGOO_H */
