@@ -1,43 +1,50 @@
-INC       := -Isrc -Isrc/lib
-
-CC        := gcc
-CCFLAGS   := -Wall -g $(INC) -Wno-unused-function
-
-LEX       := flex
-LEXFLAGS  := -o src/lexer.c src/include_lexer.l
-
-YACC      := bison
-YACCFLAGS := -d
-
 OBJ_PATH  := obj
 SRC_PATH  := src
 
-SRC       := utils.c circular_queue.c config_parser.c dependency_indexing.c main.c
-OBJ       := $(patsubst %,$(OBJ_PATH)/%,$(SRC:.c=.o))
+INC       := -Isrc -Isrc/lib
+SRC       := utils.c circular_queue.c config_parser.c dependency_indexing.c main.c lexer.c
+DEP       := $(addprefix $(OBJ_PATH)/,$(SRC:.c=.d))
+OBJ       := $(DEP:.d=.d.o)
 
+CC        := gcc
+CFLAGS    := -Wall -g $(INC) -Wno-unused-function
 LDFLAGS   := -L/usr/lib -lconfig -lfl -lsqlite3
 
-seagoo: $(OBJ) $(OBJ_PATH)/lexer.o
-	$(CC) $(CCFLAGS) -o $@ $(sort $^) $(LDFLAGS)
+LEX       := flex
 
-src/lexer.c: src/include_lexer.l
-	$(LEX) $(LEXFLAGS)
-
-$(OBJ_PATH)/%.o: $(SRC_PATH)/%.c | $(OBJ_PATH)
-	$(CC) $(CCFLAGS) -c -o $@ $<
-
-$(OBJ_PATH)/lexer.o: src/lexer.c
-	$(CC) $(CCFLAGS) -c -o $@ $<
+YACC      := bison
+YACFLAGS := -d
 
 all: $(OBJ_PATH) seagoo
 
-$(OBJ_PATH):
-	mkdir -p $@
+-include $(DEP)
 
-.PHONY: all clean run
+.NOTPARALLEL: all
 
-clean:
-	rm -rf $(OBJ_PATH)/* src/lexer.c seagoo
+seagoo: $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $(sort $^) $(LDFLAGS)
 
 run:
 	seagoo
+
+clean:
+	rm $(OBJ_PATH)/* src/lexer.c seagoo
+	rmdir $(OBJ_PATH)
+
+.PHONY: all clean run
+
+$(SRC_PATH)/%.c:
+
+include_lexer.l: # header
+
+$(SRC_PATH)/lexer.c: $(SRC_PATH)/include_lexer.l
+	$(LEX) -o $@ $<
+
+$(OBJ_PATH)/%.d.o: $(SRC_PATH)/%.c $(OBJ_PATH)/%.d
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+$(OBJ_PATH)/%.d: $(SRC_PATH)/%.c | $(OBJ_PATH)
+	$(CC) $(CFLAGS) -MM -MF $@ -MT $(addsuffix .o,$@) $<
+
+$(OBJ_PATH):
+	mkdir -p $@
