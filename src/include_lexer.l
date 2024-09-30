@@ -11,7 +11,8 @@
     int  buffer_empty_top = 0;
 
     string_vector input_file_queue;
-    string_vector done_list;
+    string_vector input_files;
+    string_vector input_error_list;
 
     void add_new_file(const char * const name);
 %}
@@ -54,29 +55,38 @@ ie  \"|\>
 %%
 
 void add_new_file(const char * const name) {
-    for (int i = 0; i < done_list.n; i++) {
-        if (!strcmp(name, kv_A(done_list, i))) {
-            goto skip;
-        }
-    }
-
-    for (int i = 0; i < input_file_queue.n; i++) {
-        if (!strcmp(name, kv_A(input_file_queue, i))) {
+    for (int i = 0; i < input_error_list.n; i++) {
+        if (!strcmp(name, kv_A(input_error_list, i))) {
             goto skip;
         }
     }
 
     // XXX: if header_name_to_path() is fixed, no NULL check is needed
     char * new_name = header_name_to_path(name);
-    if (new_name) {
-        fprintf(stderr, "\033[32mNew file: '%s'\033[0m\n", new_name);
-        kv_push(char *, input_file_queue, new_name);
+    if (!new_name) {
+        kv_push(char *, input_error_list, strdup(name));
+        return;
     }
+
+    for (int i = 0; i < input_files.n; i++) {
+        if (!strcmp(new_name, kv_A(input_files, i))) {
+            goto skip;
+        }
+    }
+
+    for (int i = 0; i < input_file_queue.n; i++) {
+        if (!strcmp(new_name, kv_A(input_file_queue, i))) {
+            goto skip;
+        }
+    }
+
+    fprintf(stderr, "\033[32mNew file: '%s'\033[0m\n", new_name);
+    kv_push(char *, input_file_queue, new_name);
 
     return;
 
   skip: // XXX debug code; just return instead
-    fprintf(stderr, "\033[33mSkipped file: '%s'\033[0m\n", name);
+    fprintf(stderr, "\033[33mSkipped file: '%s'\033[0m\n", new_name);
 }
 
 int yywrap(void) {
@@ -91,6 +101,7 @@ int yywrap(void) {
 
         yyin = fopen(filename, "r");
         if (!yyin) {
+            kv_push(char *, input_error_list, filename);
             perror(filename);
             free(filename);
         }
@@ -100,7 +111,7 @@ int yywrap(void) {
     
     fprintf(stderr, "\033[34mOpening file: '%s'\033[0m\n", filename);
 
-    kv_push(char *, done_list, strdup(filename));
+    kv_push(char *, input_files, strdup(filename));
 
     return 0;
 }

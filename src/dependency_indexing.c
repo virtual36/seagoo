@@ -47,6 +47,11 @@ int index_sourcefiles(const char * directory) {
 
   yylex();
 
+  puts("--");
+  for (int i = 0; i < input_files.n; i++) {
+    puts(kv_A(input_files, i));
+  }
+
   return 0;
 }
 
