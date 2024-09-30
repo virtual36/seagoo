@@ -9,7 +9,7 @@ char * current_file_path = NULL;
 int main(int argc, char ** argv) {
   /* +begin+ ARGUMENT PARSING */
   char source_dir[PATH_MAX];  // the directory to parse
-  // default to the current directory if none specifiedma
+  // default to the current directory if none specified
   if (getcwd(source_dir, PATH_MAX) == NULL) {
     fprintf(stderr, "err: getcwd failed\n");
     return EXIT_FAILURE;
@@ -23,11 +23,11 @@ int main(int argc, char ** argv) {
           fprintf(stderr, "err: Failed to resolve provided path: %s\n", optarg);
           return EXIT_FAILURE;
         }
-        break;  // Continue parsing for other options
+        break;
       case 'h':
         fprintf(stderr, "Usage: %s [-d directory]\n", argv[0]);
         return EXIT_SUCCESS;
-      default:  // Handle unknown options
+      default:
         fprintf(stderr, "err: Unknown option\n");
         return EXIT_FAILURE;
     }

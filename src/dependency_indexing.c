@@ -15,7 +15,7 @@ static int process_file(const char * filepath,
 
     // add current file itself to the DB
     SourceFileNode record;
-    record.filepath = strdup(filepath);
+    record.filepath = strdup(filepath); // XXX: useless allocation
     if (insert_source_file(db, &record) != SQLITE_DONE) {
       fprintf(stderr, "Failed to insert source file: %s\n", record.filepath);
     }
@@ -29,6 +29,7 @@ static int process_file(const char * filepath,
 
 /* Entry-point for indexer, accepts a codebase directory for indexing */
 int index_sourcefiles(const char * directory) {
+    // XXX: db not to be managed here
   const size_t sz = strlen(directory) + strlen("seagoo.db") + 2;
   char directory_full_path[sz];
   if (join_paths(directory, "seagoo.db", directory_full_path, sz)) {
@@ -44,6 +45,7 @@ int index_sourcefiles(const char * directory) {
     perror("ftw");
     return 1;
   }
+  // XXX: extra includes
 
   return 0;
 }
@@ -54,7 +56,7 @@ int parse_include_filepaths(const char * filepath) {
    * generated header contains a definition which automatically inserts
    * includes that were found in a file to the INCLUDES table of the DB
    */
-  // TODO(emil, anon): does this parser look like it's correct?
+  // XXX: it should return an error code
   FILE * file = fopen(filepath, "r");
   if (!file) {
     perror("Failed to open file");
@@ -65,8 +67,7 @@ int parse_include_filepaths(const char * filepath) {
   yyin = file;
 
   current_file_path = strdup(filepath);
-  yylex();
-  yyparse(); // automatically handles insertion into DB in Yacc
+  yyparse();
 
   fclose(file);
   free(current_file_path);
@@ -102,6 +103,7 @@ int init_db(const char * db_filepath) {
 }
 
 /* Creates tables in the SQLite database */
+// NOTE: this is perfectly fine for how, however we are getting #embed in the forseeable future
 int create_tables(sqlite3 * db) {
   char * errmsg = 0;
 

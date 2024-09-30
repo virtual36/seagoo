@@ -3,6 +3,7 @@
 #define READ_SAMPLE_SIZE 512
 
 /* Check if something is a non-parsable file without extension checks */
+// XXX: mimetypes exist
 int is_binary_file(const char * filepath) {
   FILE * file = fopen(filepath, "rb");
   if (!file)
