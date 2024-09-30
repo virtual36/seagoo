@@ -16,6 +16,9 @@ OBJ       := $(patsubst %,$(OBJ_PATH)/%,$(SRC:.c=.o))
 
 LDFLAGS   := -L/usr/lib -lconfig -lfl -lsqlite3
 
+seagoo: $(OBJ) $(OBJ_PATH)/lexer.o $(OBJ_PATH)/parser.o
+	$(CXX) $(CXXFLAGS) -o $@ $(sort $^) $(LDFLAGS)
+
 src/include_parser.tab.c src/include_parser.tab.h: src/include_parser.y
 	$(YACC) $(YACCFLAGS)
 
@@ -32,9 +35,6 @@ $(OBJ_PATH)/parser.o: src/include_parser.tab.c
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 all: $(OBJ_PATH) seagoo
-
-seagoo: $(OBJ) $(OBJ_PATH)/lexer.o $(OBJ_PATH)/parser.o
-	$(CXX) $(CXXFLAGS) -o $@ $(sort $^) $(LDFLAGS)
 
 $(OBJ_PATH):
 	mkdir -p $@
