@@ -7,3 +7,6 @@
 obj/*
 seagoo
 src/lexer.c
+*.db
+*.sqlite
+*.sqlite3
