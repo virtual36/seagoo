@@ -21,12 +21,13 @@ LEX       := flex
 YACC      := bison
 YACFLAGS  := -d
 
+all: release
+
 debug: CFLAGS += -ggdb -O0
 release: CFLAGS += -O3
-
-all: release
 debug release: $(OBJ_PATH) seagoo
-.NOTPARALLEL: all
+
+.NOTPARALLEL: debug release
 
 -include $(DEP)
 
@@ -40,7 +41,7 @@ clean:
 	rm $(OBJ_PATH)/* src/lexer.c seagoo
 	rmdir $(OBJ_PATH)
 
-.PHONY: all clean run
+.PHONY: all debug release clean run
 
 $(SRC_PATH)/%.c:
 
