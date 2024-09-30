@@ -40,6 +40,7 @@ typedef enum {
   SYSTEM,
 } node_t;
 extern int yylex();
+extern int yyparse();
 
 typedef struct {
   char * filepath;

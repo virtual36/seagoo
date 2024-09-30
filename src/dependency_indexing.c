@@ -65,7 +65,8 @@ int parse_include_filepaths(const char * filepath) {
   yyin = file;
 
   current_file_path = strdup(filepath);
-  yylex();  // automatically handles insertion into DB in Yacc
+  yylex();
+  yyparse(); // automatically handles insertion into DB in Yacc
 
   fclose(file);
   free(current_file_path);
