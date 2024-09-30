@@ -1,9 +1,9 @@
 .gdb_history
 *.out
+*.tab.*
+*.yy.*
 *.tb.*
 *.o
 obj/*
 seagoo
 src/lexer.c
-src/include_parser.tab.h
-src/include_parser.tab.c
