@@ -17,9 +17,9 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "lib/khash.h"
-#include "lib/kstring.h"
-#include "lib/kvec.h"
+#include "khash.h"
+#include "kstring.h"
+#include "kvec.h"
 
 #include "circular_queue.h"
 

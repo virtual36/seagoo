@@ -1,14 +1,17 @@
-OBJ_PATH  := obj
 SRC_PATH  := src
+OBJ_PATH  := obj
+LIB_PATH  := lib
+DIRS      := $(SRC_PATH) $(OBJ_PATH)
 
 LIB       := libconfig libmagic libfl sqlite3
-SRC       := utils.c circular_queue.c config_parser.c dependency_indexing.c main.c lexer.c
+SRC       := utils.c circular_queue.c config_parser.c dependency_indexing.c main.c lexer.c log.c
+
 DEP       := $(addprefix $(OBJ_PATH)/,$(SRC:.c=.d))
 OBJ       := $(DEP:.d=.d.o)
 
 CC        := gcc
 
-CPPFLAGS  := -D_FORTIFY_SOURCE=2 -Isrc -Isrc/lib
+CPPFLAGS  := -D_FORTIFY_SOURCE=2 -I$(SRC_PATH) -I$(LIB_PATH)
 
 CFLAGS    := -pipe -pie -Wl,-z,relro,-z,now -Wl,-z,noexecstack -Wl,-z,separate-code -Wall -Wno-unused-function \
              $(shell pkg-config --cflags $(LIB))
@@ -25,7 +28,8 @@ all: release
 
 debug: CFLAGS += -ggdb -O0
 release: CFLAGS += -O3
-debug release: $(OBJ_PATH) seagoo
+
+debug release: $(DIRS) seagoo
 
 .NOTPARALLEL: debug release
 
@@ -43,8 +47,6 @@ clean:
 
 .PHONY: all debug release clean run
 
-$(SRC_PATH)/%.c:
-
 include_lexer.l: # header
 
 $(SRC_PATH)/lexer.c: $(SRC_PATH)/include_lexer.l
@@ -56,5 +58,5 @@ $(OBJ_PATH)/%.d.o: $(SRC_PATH)/%.c $(OBJ_PATH)/%.d
 $(OBJ_PATH)/%.d: $(SRC_PATH)/%.c | $(OBJ_PATH)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -MM -MF $@ -MT $(addsuffix .o,$@) $<
 
-$(OBJ_PATH):
+$(DIRS):
 	mkdir -p $@
