@@ -2,25 +2,27 @@ OBJ_PATH  := obj
 SRC_PATH  := src
 
 INC       := -Isrc -Isrc/lib
-HDR       := include_lexer.l circular_queue.h seagoo.h
 SRC       := utils.c circular_queue.c config_parser.c dependency_indexing.c main.c lexer.c
-OBJ       := $(patsubst %,$(OBJ_PATH)/%,$(SRC:.c=.o))
+DEP       := $(addprefix $(OBJ_PATH)/,$(SRC:.c=.d))
+OBJ       := $(DEP:.d=.d.o)
 
 CC        := gcc
-CCFLAGS   := -Wall -g $(INC) -Wno-unused-function
+CFLAGS    := -Wall -g $(INC) -Wno-unused-function
 LDFLAGS   := -L/usr/lib -lconfig -lfl -lsqlite3
 
 LEX       := flex
-LEXFLAGS  := -o $(SRC_PATH)/lexer.c $(SRC_PATH)/include_lexer.l
 
 YACC      := bison
-YACCFLAGS := -d
+YACFLAGS := -d
 
 all: $(OBJ_PATH) seagoo
+
+-include $(DEP)
+
 .NOTPARALLEL: all
 
-seagoo: $(OBJ) $(OBJ_PATH)/lexer.o
-	$(CC) $(CCFLAGS) -o $@ $(sort $^) $(LDFLAGS)
+seagoo: $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $(sort $^) $(LDFLAGS)
 
 run:
 	seagoo
@@ -31,14 +33,18 @@ clean:
 
 .PHONY: all clean run
 
-# we could automatically generate this dependency information with gcc
-$(HDR): # header
+$(SRC_PATH)/%.c:
 
-$(SRC_PATH)/lexer.c: include_lexer.l
-	$(LEX) $(LEXFLAGS)
+include_lexer.l: # header
 
-$(OBJ_PATH)/%.o: $(SRC_PATH)/%.c | $(OBJ_PATH)
-	$(CC) $(CCFLAGS) -c -o $@ $<
+$(SRC_PATH)/lexer.c: $(SRC_PATH)/include_lexer.l
+	$(LEX) -o $@ $<
+
+$(OBJ_PATH)/%.d.o: $(SRC_PATH)/%.c $(OBJ_PATH)/%.d
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+$(OBJ_PATH)/%.d: $(SRC_PATH)/%.c | $(OBJ_PATH)
+	$(CC) $(CFLAGS) -MM -MF $@ -MT $(addsuffix .o,$@) $<
 
 $(OBJ_PATH):
 	mkdir -p $@
