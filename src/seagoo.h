@@ -105,6 +105,7 @@ int join_paths(const char * left,
                const char * right,
                char * out,
                size_t out_size);
+char * header_name_to_path(const char * const header_name);
 /* -end- UTILITIES */
 
 typedef kvec_t(char *) string_vector;

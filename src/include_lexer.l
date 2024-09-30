@@ -66,8 +66,12 @@ void add_new_file(const char * const name) {
         }
     }
 
-    fprintf(stderr, "\033[32mNew file: '%s'\033[0m\n", name);
-    kv_push(char *, input_file_queue, strdup(name));
+    // XXX: if header_name_to_path() is fixed, no NULL check is needed
+    char * new_name = header_name_to_path(name);
+    if (new_name) {
+        fprintf(stderr, "\033[32mNew file: '%s'\033[0m\n", new_name);
+        kv_push(char *, input_file_queue, new_name);
+    }
 
     return;
 
@@ -83,11 +87,14 @@ int yywrap(void) {
         if (input_file_queue.n == 0) { return 1; }
 
         filename = kv_A(input_file_queue, input_file_queue.n-1);
+        if (!filename) { goto end; }
+
         yyin = fopen(filename, "r");
         if (!yyin) {
             perror(filename);
             free(filename);
         }
+      end:
         (void)kv_pop(input_file_queue);
     }
     
