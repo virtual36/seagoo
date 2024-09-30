@@ -8,23 +8,24 @@
  */
 
 /* Check if something is a non-parsable file without extension checks */
+    /* TODO: support in the config adding a list of regex patterns for
+     * a whitelist and blacklist. This is so that users can indicate to
+     * us what files they want us to index.
+     */
 // XXX: mimetypes exist
-int is_binary_file(const char * filepath) {
-  FILE * file = fopen(filepath, "rb");
-  if (!file)
-    return 1;
+int is_non_source_file(const char * filepath) {
+  magic_t mimetype_reader = magic_open(MAGIC_MIME_TYPE);
+  if (magic_load(mimetype_reader, NULL) == -1) { return 1; }
 
-  unsigned char buffer[READ_SAMPLE_SIZE];
-  size_t bytes_read = fread(buffer, 1, READ_SAMPLE_SIZE, file);
-  fclose(file);
+  // NOTE: It *is* a const char *; do not try to free it; copy it if you have to
+  const char * mime = magic_file(mimetype_reader, filepath);
+  if (mime == NULL) { return 1; }
 
-  for (size_t i = 0; i < bytes_read; ++i) {
-    if (!isprint(buffer[i]) && !isspace(buffer[i])) {
-      return 1; /* binary file*/
-    }
-  }
+  log_notice(stderr, "'%s' was not a source file (%s)", filepath, mime);
 
-  return 0; /* text file */
+  magic_close(mimetype_reader);
+
+  return 1;
 }
 
 int join_paths(const char * left,

@@ -6,6 +6,10 @@
 sqlite3 * db = NULL;
 char * current_file_path = NULL;
 
+static
+int init(void) {
+}
+
 int main(int argc, char ** argv) {
   /* +begin+ ARGUMENT PARSING */
   char source_dir[PATH_MAX];  // the directory to parse

@@ -16,10 +16,12 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include <magic.h>
 
 #include "lib/khash.h"
 #include "lib/kstring.h"
 #include "lib/kvec.h"
+#include "lib/log.h"
 
 #include "circular_queue.h"
 
@@ -100,7 +102,7 @@ int tbtraverse(const char * tbcode);
 
 /* +begin+ UTILITIES */
 #define PATH_SEPARATOR "/"
-int is_binary_file(const char * filepath);
+int is_non_source_file(const char * filepath);
 int join_paths(const char * left,
                const char * right,
                char * out,

@@ -5,11 +5,7 @@ static int process_file(const char * filepath,
                         const struct stat * statbuf,
                         int typeflag) {
   if (typeflag == FTW_F || typeflag == FTW_SL) {
-    /* TODO: support in the config adding a list of regex patterns for
-     * a whitelist and blacklist. This is so that users can indicate to
-     * us what files they want us to index.
-     */
-    if (is_binary_file(filepath)) {
+    if (is_non_source_file(filepath)) {
       return 0;
     }
 

@@ -80,13 +80,13 @@ void add_new_file(const char * const name) {
         }
     }
 
-    fprintf(stderr, "\033[32mNew file: '%s'\033[0m\n", new_name);
+    log_notice("\033[32mNew file: '%s'\033[0m\n", new_name);
     kv_push(char *, input_file_queue, new_name);
 
     return;
 
   skip: // XXX debug code; just return instead
-    fprintf(stderr, "\033[33mSkipped file: '%s'\033[0m\n", new_name);
+    log_notice(stderr, "\033[33mSkipped file: '%s'\033[0m\n", new_name);
 }
 
 int yywrap(void) {
@@ -102,14 +102,14 @@ int yywrap(void) {
         yyin = fopen(filename, "r");
         if (!yyin) {
             kv_push(char *, input_error_list, filename);
-            perror(filename);
+            log_warn("failed to open file '%s'", filename);
             free(filename);
         }
       end:
         (void)kv_pop(input_file_queue);
     }
     
-    fprintf(stderr, "\033[34mOpening file: '%s'\033[0m\n", filename);
+    log_notice(stderr, "\033[34mOpening file: '%s'\033[0m\n", filename);
 
     kv_push(char *, input_files, strdup(filename));
 
