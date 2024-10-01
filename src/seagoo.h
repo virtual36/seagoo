@@ -114,4 +114,7 @@ typedef kvec_t(char *) string_vector;
 extern string_vector input_file_queue; // XXX: the name is kinda misleading
 extern string_vector input_files;
 
+// this is retarded
+int parse_arguments(int argc, char ** argv);
+
 #endif /* SEAGOO_H */
