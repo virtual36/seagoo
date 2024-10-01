@@ -18,10 +18,10 @@
 #include <unistd.h>
 #include <magic.h>
 
-#include "lib/khash.h"
-#include "lib/kstring.h"
-#include "lib/kvec.h"
-#include "lib/log.h"
+#include "khash.h"
+#include "kstring.h"
+#include "kvec.h"
+#include "log.h"
 
 #include "circular_queue.h"
 

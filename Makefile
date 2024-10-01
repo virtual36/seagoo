@@ -3,7 +3,7 @@ OBJ_DIR   := obj
 LIB_DIR   := lib
 DIRS      := $(SRC_DIR) $(OBJ_DIR)
 
-LIB       := libconfig libmagic libfl sqlite3
+LIB       := libconfig libmagic sqlite3
 SRC       := utils.c circular_queue.c config_parser.c dependency_indexing.c main.c lexer.c log.c
 
 DEP       := $(addprefix $(OBJ_DIR)/,$(SRC:.c=.d))
@@ -14,7 +14,8 @@ CC        := gcc
 CPPFLAGS  := -D_FORTIFY_SOURCE=2 -I$(SRC_DIR) -I$(LIB_DIR)
 
 CFLAGS    := -pipe -pie -Wl,-z,relro,-z,now -Wl,-z,noexecstack -Wl,-z,separate-code -Wall -Wno-unused-function \
-             $(shell pkg-config --cflags $(LIB))
+             $(shell pkg-config --cflags $(LIB)) \
+			 -ggdb
 
 LDFLAGS   := -L/usr/lib \
              $(shell pkg-config --libs $(LIB))

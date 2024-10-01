@@ -55,17 +55,17 @@ ie  \"|\>
 %%
 
 void add_new_file(const char * const name) {
-    for (int i = 0; i < input_error_list.n; i++) {
-        if (!strcmp(name, kv_A(input_error_list, i))) {
-            goto skip;
-        }
-    }
-
     // XXX: if header_name_to_path() is fixed, no NULL check is needed
     char * new_name = header_name_to_path(name);
     if (!new_name) {
         kv_push(char *, input_error_list, strdup(name));
         return;
+    }
+
+    for (int i = 0; i < input_error_list.n; i++) {
+        if (!strcmp(name, kv_A(input_error_list, i))) {
+            goto skip;
+        }
     }
 
     for (int i = 0; i < input_files.n; i++) {
@@ -80,13 +80,13 @@ void add_new_file(const char * const name) {
         }
     }
 
-    log_notice("\033[32mNew file: '%s'\033[0m\n", new_name);
+    log_info("\033[32mNew file: '%s'\033[0m", new_name);
     kv_push(char *, input_file_queue, new_name);
 
     return;
 
   skip: // XXX debug code; just return instead
-    log_notice(stderr, "\033[33mSkipped file: '%s'\033[0m\n", new_name);
+    log_info("\033[33mSkipped file: '%s'\033[0m", new_name);
 }
 
 int yywrap(void) {
@@ -109,7 +109,7 @@ int yywrap(void) {
         (void)kv_pop(input_file_queue);
     }
     
-    log_notice(stderr, "\033[34mOpening file: '%s'\033[0m\n", filename);
+    log_info("\033[34mOpening file: '%s'\033[0m", filename);
 
     kv_push(char *, input_files, strdup(filename));
 

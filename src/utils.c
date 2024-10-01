@@ -12,20 +12,33 @@
      * a whitelist and blacklist. This is so that users can indicate to
      * us what files they want us to index.
      */
-// XXX: mimetypes exist
+static magic_t mimetype_reader = NULL; // XXX: it does very strange things with memory
+
 int is_non_source_file(const char * filepath) {
-  magic_t mimetype_reader = magic_open(MAGIC_MIME_TYPE);
+  const char * const prefix_blacklist[] = {
+    "application",
+  };
+
+  if (!mimetype_reader) {
+    mimetype_reader = magic_open(MAGIC_MIME_TYPE);
+  }
+
   if (magic_load(mimetype_reader, NULL) == -1) { return 1; }
 
   // NOTE: It *is* a const char *; do not try to free it; copy it if you have to
   const char * mime = magic_file(mimetype_reader, filepath);
   if (mime == NULL) { return 1; }
 
-  log_notice(stderr, "'%s' was not a source file (%s)", filepath, mime);
+  //magic_close(mimetype_reader); // XXX
 
-  magic_close(mimetype_reader);
+  for (int i = 0; i < (sizeof(prefix_blacklist) / sizeof(char *)); i++) {
+    if (!memcmp(mime, prefix_blacklist[i], strlen(prefix_blacklist[i]))) {
+      log_debug("'%s' was not a source file (%s)", filepath, mime);
+      return 1;
+    }
+  }
 
-  return 1;
+  return 0;
 }
 
 int join_paths(const char * left,
