@@ -22,20 +22,8 @@ static int process_file(const char * filepath,
   return 0;
 }
 
-/* Entry-point for indexer, accepts a codebase directory for indexing */
-int index_sourcefiles(const char * directory) {
-    // XXX: db not to be managed here
-  const size_t sz = strlen(directory) + strlen("seagoo.db") + 2;
-  char directory_full_path[sz];
-  if (join_paths(directory, "seagoo.db", directory_full_path, sz)) {
-    fprintf(stderr, "err: error joining paths while indexing sourcefiles\n");
-  }
-
-  if (init_db(directory_full_path) != SQLITE_OK) {
-    fprintf(stderr, "Failed to initialize the database\n");
-    return 1;
-  }
-
+static
+int collect_source_files(const char * directory) {
   if (ftw(directory, process_file, 20) == -1) {
     perror("ftw");
     return 1;
@@ -47,6 +35,30 @@ int index_sourcefiles(const char * directory) {
   for (int i = 0; i < input_files.n; i++) {
     puts(kv_A(input_files, i));
   }
+
+  return 0;
+}
+
+/* Entry-point for indexer, accepts a codebase directory for indexing */
+int index_sourcefiles(const char * directory) {
+    // XXX: db not to be managed here
+    // XXX: why do we need the full path to begin with?
+  const size_t sz = strlen(directory) + strlen("seagoo.db") + 2;
+  char directory_full_path[sz];
+  if (join_paths(directory, "seagoo.db", directory_full_path, sz)) {
+    fprintf(stderr, "err: error joining paths while indexing sourcefiles\n");
+  }
+
+  if (init_db(directory_full_path) != SQLITE_OK) {
+    fprintf(stderr, "Failed to initialize the database\n");
+    return 1;
+  }
+
+  if (collect_source_files(directory)) {
+    return 1;
+  }
+
+  // XXX: call tbtraverse on each file
 
   return 0;
 }

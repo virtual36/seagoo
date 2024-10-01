@@ -52,37 +52,6 @@ int index_sourcefiles(const char * directory);
 int parse_include_filepaths(const char * filepath);
 
 extern sqlite3 * db;
-extern char * current_file_path;
-
-#define CREATE_TABLES_SQL                    \
-  "CREATE TABLE IF NOT EXISTS SourceFiles (" \
-  "id INTEGER PRIMARY KEY AUTOINCREMENT,"    \
-  "filepath TEXT NOT NULL UNIQUE);"
-
-#define INSERT_SOURCEFILE_SQL \
-  "INSERT OR IGNORE INTO SourceFiles (filepath) VALUES (?);"
-
-// Define the Includes table
-#define CREATE_INCLUDES_TABLE_SQL                            \
-  "CREATE TABLE IF NOT EXISTS Includes ("                    \
-  "id INTEGER PRIMARY KEY AUTOINCREMENT,"                    \
-  "source_file_id INTEGER,"                                  \
-  "included_file_id INTEGER,"                                \
-  "FOREIGN KEY (source_file_id) REFERENCES SourceFiles(id)," \
-  "FOREIGN KEY (included_file_id) REFERENCES SourceFiles(id));"
-
-// Insert statement for the Includes table
-#define INSERT_INCLUDE_SQL                                                    \
-  "INSERT OR IGNORE INTO Includes (source_file_id, included_file_id) VALUES " \
-  "(?, ?);"
-
-// Query to lookup includes for a given source file
-#define LOOKUP_INCLUDES_SQL                                              \
-  "SELECT sf_included.filepath "                                         \
-  "FROM Includes i "                                                     \
-  "JOIN SourceFiles sf ON i.source_file_id = sf.id "                     \
-  "JOIN SourceFiles sf_included ON i.included_file_id = sf_included.id " \
-  "WHERE sf.filepath = ?;"
 
 int init_db(const char * db_filepath);
 int create_tables(sqlite3 * db);
@@ -101,6 +70,7 @@ int tbtraverse(const char * tbcode);
 /* -end- SYNTAX TREE CONSTRUCTION */
 
 /* +begin+ UTILITIES */
+// XXX: explain to me why we need this
 #define PATH_SEPARATOR "/"
 int is_non_source_file(const char * filepath);
 int join_paths(const char * left,
