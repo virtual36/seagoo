@@ -5,11 +5,11 @@
 #include <stdlib.h>
 
 typedef struct {
-  void ** data;
-  int front;
-  int rear;
-  int size;
-  int count;
+	void ** data;
+	int front;
+	int rear;
+	int size;
+	int count;
 } circular_queue;
 
 int circular_queue_init(circular_queue * q, int size);

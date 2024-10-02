@@ -1,5 +1,6 @@
-BasedOnStyle: Chromium 
+BasedOnStyle: Chromium
 IndentWidth: 2
+UseTab: Always
 PointerAlignment: Middle
 ReferenceAlignment: Middle
 ColumnLimit: 81

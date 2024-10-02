@@ -37,15 +37,15 @@ int get_config_value(const char * key, const config_t * cfg, void * out_value);
 
 /* +begin+ SOURCEFILE INDEXING */
 typedef enum {
-  DEFAULT,
-  INTERFACE,
-  SYSTEM,
+	DEFAULT,
+	INTERFACE,
+	SYSTEM,
 } node_t;
 extern int yylex();
 extern int yyparse();
 
 typedef struct {
-  char * filepath;
+	char * filepath;
 } SourceFileNode;
 
 int index_sourcefiles(const char * directory);
@@ -74,9 +74,9 @@ int tbtraverse(const char * tbcode);
 #define PATH_SEPARATOR "/"
 int is_non_source_file(const char * filepath);
 int join_paths(const char * left,
-               const char * right,
-               char * out,
-               size_t out_size);
+			   const char * right,
+			   char * out,
+			   size_t out_size);
 char * header_name_to_path(const char * const header_name);
 /* -end- UTILITIES */
 
