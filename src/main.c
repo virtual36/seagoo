@@ -1,4 +1,3 @@
-#include <libconfig.h>
 #include "seagoo.h"
 
 char source_dir[PATH_MAX];  // the directory to parse
@@ -30,7 +29,7 @@ int main(int argc, char ** argv) {
 	snprintf(config_file, sizeof(config_file), "%s/.config/seagoo/%s", home_dir,
 			CONFIG_FILENAME);
 
-	config_t cfg;
+	ini_t *cfg;
 	load_config(config_file, &cfg);
 	/* -end- CONFIGURATION FILE HANDLING */
 

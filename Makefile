@@ -3,8 +3,8 @@ OBJ_DIR   := obj
 LIB_DIR   := lib
 DIRS      := $(SRC_DIR) $(OBJ_DIR)
 
-LIB       := libconfig libmagic sqlite3
-SRC       := utils.c circular_queue.c config_parser.c dependency_indexing.c main.c lexer.c log.c db.c cli.c
+LIB       := libmagic sqlite3
+SRC       := utils.c circular_queue.c config_parser.c dependency_indexing.c main.c lexer.c log.c db.c cli.c ini.c
 
 DEP       := $(addprefix $(OBJ_DIR)/,$(SRC:.c=.d))
 OBJ       := $(DEP:.d=.d.o)

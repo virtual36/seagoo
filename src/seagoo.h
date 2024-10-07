@@ -5,7 +5,6 @@
 #include <dirent.h>
 #include <errno.h>
 #include <ftw.h>
-#include <libconfig.h>
 #include <libgen.h>
 #include <limits.h>
 #include <sqlite3.h>
@@ -21,17 +20,18 @@
 #include "khash.h"
 #include "kvec.h"
 #include "log.h"
+#include "ini.h"
 
 #include "circular_queue.h"
 
 /* +begin+ CONFIGURATION FILE HANDLING */
 #define CONFIG_FILENAME "seagoo.cfg"
 
-int load_config(const char * filename, config_t * cfg);
-int store_config(const char * filename, const config_t * cfg);
+int load_config(const char * filename, ini_t ** cfg);
+int store_config(const char * filename, const ini_t * cfg);
 int write_default_config(const char * filename);
-int create_default_config_directory();
-int get_config_value(const char * key, const config_t * cfg, void * out_value);
+int create_default_config_directory(void);
+#define get_config_value(key, cfg, out_value) ini_sget(cfg, NULL, key, NULL, out_value)
 /* -end- CONFIGURATION FILE HANDLING */
 
 /* +begin+ SOURCEFILE INDEXING */
