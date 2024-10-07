@@ -4,7 +4,7 @@
 int circular_queue_init(circular_queue * q, int size) {
 	q->data = (void **)malloc(size * sizeof(int));
 	if (!q->data) {
-		fprintf(stderr, "err: Circular queue malloc failed.\n");
+		log_error("Circular queue malloc failed.\n");
 		return -1;
 	}
 	q->front = 0;
@@ -34,7 +34,7 @@ int circular_queue_is_full(circular_queue * q) {
 /* Enqueue an item into the circular queue*/
 int circular_queue_enqueue(circular_queue * q, void * item) {
 	if (circular_queue_is_full(q)) {
-		fprintf(stderr, "err: Ciruclar Queue is full. Cannot enqueue.\n");
+		log_error("Ciruclar Queue is full. Cannot enqueue.\n");
 		return -1;
 	}
 	q->data[q->rear] = item;
@@ -46,7 +46,7 @@ int circular_queue_enqueue(circular_queue * q, void * item) {
 /* Dequeue an item from the circular queue*/
 int circular_queue_dequeue(circular_queue * q, void ** item) {
 	if (circular_queue_is_empty(q)) {
-		fprintf(stderr, "err: Circular queue is empty. Cannot dequeue.\n");
+		log_error("Circular queue is empty. Cannot dequeue.\n");
 		return -1;
 	}
 	*item = q->data[q->front];

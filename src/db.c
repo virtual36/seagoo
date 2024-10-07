@@ -37,7 +37,7 @@ sqlite3 * db = NULL;
 /* Initializes index database at a specific filepath with required tables */
 int init_db(const char * db_filepath) {
 	if (db_filepath == NULL) {
-		fprintf(stderr, "Database filepath is NULL\n");
+		log_error("Database filepath is NULL\n");
 		return SQLITE_ERROR;
 	}
 
@@ -46,13 +46,13 @@ int init_db(const char * db_filepath) {
 	int rc = sqlite3_open(db_filepath, &db);
 
 	if (rc != SQLITE_OK) {
-		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		log_error("Can't open database: %s\n", sqlite3_errmsg(db));
 		return rc;
 	}
 
 	rc = create_tables(db);
 	if (rc != SQLITE_OK) {
-		fprintf(stderr, "Failed to create tables: %s\n", sqlite3_errmsg(db));
+		log_error("Failed to create tables: %s\n", sqlite3_errmsg(db));
 		sqlite3_close(db);
 		return rc;
 	}
@@ -70,7 +70,7 @@ int create_tables(sqlite3 * db) {
 	// Create SourceFiles table
 	int rc = sqlite3_exec(db, CREATE_TABLES_SQL, 0, 0, &errmsg);
 	if (rc != SQLITE_OK) {
-		fprintf(stderr, "SQL error: %s\n", errmsg);
+		log_error("SQL error: %s\n", errmsg);
 		sqlite3_free(errmsg);
 		return rc;
 	}
@@ -78,7 +78,7 @@ int create_tables(sqlite3 * db) {
 	// Create Includes table
 	rc = sqlite3_exec(db, CREATE_INCLUDES_TABLE_SQL, 0, 0, &errmsg);
 	if (rc != SQLITE_OK) {
-		fprintf(stderr, "SQL error: %s\n", errmsg);
+		log_error("SQL error: %s\n", errmsg);
 		sqlite3_free(errmsg);
 		return rc;
 	}
@@ -92,7 +92,7 @@ int insert_source_file(sqlite3 * db, const SourceFileNode * record) {
 	int rc = sqlite3_prepare_v2(db, INSERT_SOURCEFILE_SQL, -1, &stmt, NULL);
 
 	if (rc != SQLITE_OK) {
-		fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+		log_error("Failed to prepare statement: %s\n", sqlite3_errmsg(db));
 		return rc;
 	}
 
@@ -100,7 +100,7 @@ int insert_source_file(sqlite3 * db, const SourceFileNode * record) {
 
 	rc = sqlite3_step(stmt);
 	if (rc != SQLITE_DONE) {
-		fprintf(stderr, "Failed to insert data: %s\n", sqlite3_errmsg(db));
+		log_error("Failed to insert data: %s\n", sqlite3_errmsg(db));
 	}
 
 	sqlite3_finalize(stmt);
@@ -115,7 +115,7 @@ int insert_include(sqlite3 * db, int source_file_id, char * included_filepath) {
 	// Check if the included file already exists
 	const char * check_sql = "SELECT id FROM SourceFiles WHERE filepath = ?";
 	if (sqlite3_prepare_v2(db, check_sql, -1, &stmt, NULL) != SQLITE_OK) {
-		fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+		log_error("Failed to prepare statement: %s\n", sqlite3_errmsg(db));
 		return -1;
 	}
 
@@ -129,14 +129,14 @@ int insert_include(sqlite3 * db, int source_file_id, char * included_filepath) {
 		sqlite3_finalize(stmt);
 
 		if (sqlite3_prepare_v2(db, insert_sql, -1, &stmt, NULL) != SQLITE_OK) {
-			fprintf(stderr, "Failed to prepare insert statement: %s\n",
+			log_error("Failed to prepare insert statement: %s\n",
 					sqlite3_errmsg(db));
 			return -1;
 		}
 
 		sqlite3_bind_text(stmt, 1, included_filepath, -1, SQLITE_STATIC);
 		if (sqlite3_step(stmt) != SQLITE_DONE) {
-			fprintf(stderr, "Failed to insert included file: %s\n",
+			log_error("Failed to insert included file: %s\n",
 					sqlite3_errmsg(db));
 			sqlite3_finalize(stmt);
 			return -1;
@@ -150,7 +150,7 @@ int insert_include(sqlite3 * db, int source_file_id, char * included_filepath) {
 	// Now insert the relationship into the Includes table
 	const char * insert_include_sql = INSERT_INCLUDE_SQL;
 	if (sqlite3_prepare_v2(db, insert_include_sql, -1, &stmt, NULL) != SQLITE_OK) {
-		fprintf(stderr, "Failed to prepare include statement: %s\n",
+		log_error("Failed to prepare include statement: %s\n",
 				sqlite3_errmsg(db));
 		return -1;
 	}
@@ -159,7 +159,7 @@ int insert_include(sqlite3 * db, int source_file_id, char * included_filepath) {
 	sqlite3_bind_int(stmt, 2, included_file_id);
 
 	if (sqlite3_step(stmt) != SQLITE_DONE) {
-		fprintf(stderr, "Failed to insert include relationship: %s\n",
+		log_error("Failed to insert include relationship: %s\n",
 				sqlite3_errmsg(db));
 	}
 
@@ -174,13 +174,13 @@ includes_vector_t * lookup_includes(sqlite3 * db, const char * filepath) {
 
 	includes_vector_t * result = malloc(sizeof(includes_vector_t));
 	if (!result) {
-		fprintf(stderr, "Memory allocation failed\n");
+		log_error("Memory allocation failed\n");
 		return NULL;
 	}
 	kv_init(*result);
 
 	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-		fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+		log_error("Failed to prepare statement: %s\n", sqlite3_errmsg(db));
 		free(result);
 		return NULL;
 	}
@@ -201,7 +201,7 @@ int get_source_file_id(sqlite3 * db, char * filepath) {
 	const char * sql = "SELECT id FROM SourceFiles WHERE filepath = ?";
 
 	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-		fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+		log_error("Failed to prepare statement: %s\n", sqlite3_errmsg(db));
 		return -1;
 	}
 
@@ -209,7 +209,7 @@ int get_source_file_id(sqlite3 * db, char * filepath) {
 
 	int source_file_id = -1;  // default to -1 if not found
 	if (sqlite3_step(stmt) == SQLITE_ROW) {
-	source_file_id = sqlite3_column_int(stmt, 0);
+		source_file_id = sqlite3_column_int(stmt, 0);
 	}
 
 	sqlite3_finalize(stmt);

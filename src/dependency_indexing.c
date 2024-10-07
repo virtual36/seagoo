@@ -13,7 +13,7 @@ static int process_file(const char * filepath,
 		SourceFileNode record;
 		record.filepath = strdup(filepath); // XXX: useless allocation
 		if (insert_source_file(db, &record) != SQLITE_DONE) {
-			fprintf(stderr, "Failed to insert source file: %s\n", record.filepath);
+			log_error("Failed to insert source file: %s\n", record.filepath);
 		}
 		free(record.filepath);
 
@@ -46,11 +46,11 @@ int index_sourcefiles(const char * directory) {
 	const size_t sz = strlen(directory) + strlen("seagoo.db") + 2;
 	char directory_full_path[sz];
 	if (join_paths(directory, "seagoo.db", directory_full_path, sz)) {
-		fprintf(stderr, "err: error joining paths while indexing sourcefiles\n");
+		log_error("error joining paths while indexing sourcefiles\n");
 	}
 
 	if (init_db(directory_full_path) != SQLITE_OK) {
-			fprintf(stderr, "Failed to initialize the database\n");
+			log_error("Failed to initialize the database\n");
 	return 1;
 	}
 

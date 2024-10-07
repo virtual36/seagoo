@@ -4,6 +4,9 @@
 char source_dir[PATH_MAX];  // the directory to parse
 
 int main(int argc, char ** argv) {
+
+	printf("%d\n", 0700);
+	return 0;
 	/* +begin+ ARGUMENT PARSING */
 	if (parse_arguments(argc, argv)) {
 		return EXIT_FAILURE;
@@ -11,7 +14,7 @@ int main(int argc, char ** argv) {
 
 	if (!source_dir[0]) {
 		if (!getcwd(source_dir, PATH_MAX)) {
-			fprintf(stderr, "err: getcwd failed\n");
+			log_error("getcwd failed\n");
 			return EXIT_FAILURE;
 		}
 	}
@@ -23,7 +26,7 @@ int main(int argc, char ** argv) {
 	}
 	const char * home_dir = getenv("HOME");
 	if (home_dir == NULL) {
-		fprintf(stderr, "err: $HOME environment variable is not set.\n");
+		log_error("$HOME environment variable is not set.\n");
 		return EXIT_FAILURE;
 	}
 	char config_file[PATH_MAX];

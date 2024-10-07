@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "log.h"
 
 typedef struct {
 	void ** data;

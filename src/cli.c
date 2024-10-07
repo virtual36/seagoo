@@ -8,7 +8,7 @@ int parse_arguments(int argc, char ** argv) {
 		switch (option) {
 			case 'd':
 				if (realpath(optarg, source_dir) == NULL) {
-					fprintf(stderr, "err: Failed to resolve provided path: %s\n", optarg);
+					log_error("Failed to resolve provided path: %s\n", optarg);
 					return 1;
 				}
 				break;
@@ -16,7 +16,7 @@ int parse_arguments(int argc, char ** argv) {
 				printf("Usage: %s [-d directory]\n", argv[0]);
 				exit(0);
 			default:
-				fprintf(stderr, "err: Unknown option\n");
+				log_error("Unknown option\n");
 				return 1;
 		}
 	}
