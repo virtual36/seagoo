@@ -19,7 +19,6 @@
 #include <magic.h>
 
 #include "khash.h"
-#include "kstring.h"
 #include "kvec.h"
 #include "log.h"
 
