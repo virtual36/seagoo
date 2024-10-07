@@ -39,7 +39,7 @@ int main(int argc, char ** argv) {
 
 	/* +begin+ CLEANUP */
 	close_db(db);
-	config_destroy(&cfg);
+	ini_free(cfg);
 	/* -end- CLEANUP */
 
 	return EXIT_SUCCESS;
