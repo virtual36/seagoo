@@ -4,9 +4,6 @@
 char source_dir[PATH_MAX];  // the directory to parse
 
 int main(int argc, char ** argv) {
-
-	printf("%d\n", 0700);
-	return 0;
 	/* +begin+ ARGUMENT PARSING */
 	if (parse_arguments(argc, argv)) {
 		return EXIT_FAILURE;
