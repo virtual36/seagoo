@@ -8,6 +8,7 @@
 #include <libgen.h>
 #include <limits.h>
 #include <sqlite3.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -62,6 +63,11 @@ int close_db(sqlite3 * db);
 typedef kvec_t(char *) includes_vector_t;
 includes_vector_t * lookup_includes(sqlite3 * db, const char * filepath);
 void destroy_includes_vector(includes_vector_t * vec);
+
+// used by lexer
+typedef kvec_t(char *) string_vector;
+extern string_vector input_file_queue; // XXX: the name is kinda misleading
+extern string_vector input_files;
 /* -end- SOURCEFILE INDEXING */
 
 /* +begin+ SYNTAX TREE CONSTRUCTION */
@@ -77,13 +83,38 @@ int join_paths(const char * left,
 			   char * out,
 			   size_t out_size);
 char * header_name_to_path(const char * const header_name);
-/* -end- UTILITIES */
-
-typedef kvec_t(char *) string_vector;
-extern string_vector input_file_queue; // XXX: the name is kinda misleading
-extern string_vector input_files;
 
 // this is retarded
 int parse_arguments(int argc, char ** argv);
+/* -end- UTILITIES */
+
+/* +begin+ trigram search helpers */
+// Data structure to hold a list of files
+typedef struct FileListNode {
+    char *filename;
+    struct FileListNode *next;
+} FileListNode;
+
+// Data structure to hold trigram index entries
+typedef struct TrigramEntry {
+    uint32_t trigram;
+    FileListNode *file_list;
+} TrigramEntry;
+
+// Data structure to hold the index of trigrams
+typedef struct TrigramIndex {
+    TrigramEntry *entries;
+    size_t count;
+    size_t capacity;
+} TrigramIndex;
+
+// Functions to build and search the trigram index
+TrigramIndex *create_trigram_index(void);
+void free_trigram_index(TrigramIndex *index);
+
+int add_file_to_index(TrigramIndex *index, const char *filename);
+
+int search_trigram_index(TrigramIndex *index, const char *query, char ***results, size_t *results_count);
+/* -end- trigram search helpers */
 
 #endif /* SEAGOO_H */
