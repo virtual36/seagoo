@@ -1,0 +1,69 @@
+' @BAKE plantuml seagoo.puml
+@startuml
+
+class main {
+    == <b><color:purple> main </color></b> ==
+    initialize;
+    parse_arguments;
+    parse_config;
+    parse_headers;
+    build_db;
+    query;
+}
+
+class cli {
+    + parse_arguments(argc, argv);
+    + symbol_dump_callback(stmt : sqlite3_stmt);
+}
+
+class cfg_h << (H,gray) >> {
+    + input_files : [string];
+    + system_library_paths : [string];
+    + do_ignore_system : [string];
+}
+note right of cfg_h : preferable to passing around \n a config object speudo-singleton;\nthe gui might need a struct later;\nhow does ${lib} handle it?
+
+class cfg {
+    + parse_config(file);
+}
+
+class header_yy << (L,pink) >> {
+    + header_in;
+    + header_lex();
+}
+
+class build {
+    + build(input_files : [string]);
+}
+
+class c_tbsp << (T,orange) >> {
+    + tbtraverse();
+}
+
+
+class db {
+    - db : sqlite3;
+    + filter_not_changed();
+    + insert_symbol();
+    + query(s, callback);
+}
+
+
+
+main::parse_arguments --|> cli
+main::parse_config    --|> cfg
+main::parse_headers   --|> header_yy
+main::build_db        --|> build
+main::query           --|> db
+
+build --|> c_tbsp
+build::build --|> db::filter_not_changed
+c_tbsp --|> db
+
+cfg_h <--down-- cli
+cfg_h <--down-- cfg
+cfg_h <--down-- build
+cfg_h <--down-- header_yy
+cfg_h <--down-- db
+
+@enduml
